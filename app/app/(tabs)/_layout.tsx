@@ -1,8 +1,8 @@
+
 import { Tabs } from 'expo-router';
 import React from 'react';
 
 import { MaterialCommunityIcons } from 'react-native-vector-icons';
-import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
@@ -12,21 +12,32 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions = {{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
+        headerShown: true,
 
         tabBarStyle: {
-          backgroundColor: '#01bfb3',
+          backgroundColor: '#00bfb2',
           height: 100,
+        },
+
+        headerTitleAlign: 'center',
+
+        headerStyle: {
+          backgroundColor: '#00bfb2',
+        },
+
+        headerTitleStyle: {
+          color: 'white',
+          fontWeight: 'bold'
         },
 
         tabBarLabelPosition: 'below-icon'
       }}>
 
       <Tabs.Screen
-        name = "index"
+        name = "tienda"
         options = {{
           tabBarLabel: 'Tiendas',
+          headerTitle: 'Tienda',
 
           tabBarLabelStyle: {
             color: 'white',
@@ -46,9 +57,10 @@ export default function TabLayout() {
       />
       
       <Tabs.Screen
-        name = "explore"
+        name = "producto"
         options = {{
           tabBarLabel: 'Productos',
+          headerTitle: 'Productos',
 
           tabBarLabelStyle: {
             color: 'white',
