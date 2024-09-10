@@ -41,6 +41,16 @@ export default function TabLayout() {
             ),
           }}
         />
+
+      <Tabs.Screen
+          name="recuperar"
+          options={{
+            title: 'Recuperar',
+            tabBarIcon: ({ color, focused }) => (
+              <TabBarIcon name={focused ? 'person-add' : 'person-add-outline'} color={color} />
+            ),
+          }}
+        />
     </Tabs>
   );
 }

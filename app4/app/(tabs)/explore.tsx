@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { View, TextInput, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, TextInput, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
 import { CheckBox } from 'react-native-elements'; // Nueva importación de CheckBox
 import { Ionicons } from '@expo/vector-icons';
+import { signInWithEmailAndPassword } from 'firebase/auth'; // Importar el método de autenticación
+import { auth } from '@/scripts/firebaseConfig'; // Importar la configuración de Firebase
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -12,8 +14,29 @@ export default function ExploreScreen() {
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
 
-  const handleLogin = () => {
-    console.log('Login attempt:', email, password);
+  const handleLogin = async () => {
+    try {
+      // Intentar iniciar sesión con Firebase
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Mostrar un mensaje de éxito en consola
+      console.log(`Inicio de sesión exitoso: ${user.email}`);
+
+      // Mostrar una alerta que indica que la sesión se inició correctamente
+      Alert.alert('Inicio de sesión exitoso', `Bienvenido, ${user.email}`);
+
+      // Aquí podrías agregar lógica adicional, como redireccionar al usuario
+    } catch (error) {
+      // Manejar errores de inicio de sesión
+      if (error instanceof Error) {
+        console.log('Error de inicio de sesión:', error.message);
+        Alert.alert('Error', error.message);
+      } else {
+        console.log('Error inesperado durante el inicio de sesión.');
+        Alert.alert('Error', 'Ocurrió un error inesperado.');
+      }
+    }
   };
 
   return (
@@ -25,7 +48,7 @@ export default function ExploreScreen() {
           style={styles.logo}
         />
       }>
-      
+
       <ThemedView style={styles.centeredContainer}>
         <View style={styles.formBox}>
           <ThemedText type="title" style={styles.titleText}>Inicio de Sesión</ThemedText>
@@ -134,7 +157,7 @@ const styles = StyleSheet.create({
   rememberMeContainer: {
     marginBottom: 15,
     width: '100%',
-  },
+  },  
   checkboxContainer: {
     backgroundColor: 'transparent',
     borderWidth: 0,
