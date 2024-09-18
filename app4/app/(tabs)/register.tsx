@@ -1,36 +1,56 @@
 import React, { useState } from "react";
 import { Text, TextInput, TouchableOpacity, View, StyleSheet, Alert } from "react-native";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../scripts/firebaseConfig"; // Asegúrate de la ruta correcta
+import { auth, db } from "../../scripts/firebaseConfig"; // Importar Firestore también
+import { doc, setDoc } from "firebase/firestore"; // Para guardar datos en Firestore
 import { Ionicons } from "@expo/vector-icons"; // Para los iconos de contraseña
 
 const RegisterScreen = () => {
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
+  const [rut, setRut] = useState(""); // Nuevo campo de RUT
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [message, setMessage] = useState("");
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     if (password !== confirmPassword) {
       Alert.alert("Error", "Las contraseñas no coinciden");
       return;
     }
 
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        setMessage("Usuario registrado con éxito!");
-        console.log("Usuario registrado:", userCredential.user);
-        Alert.alert("Éxito", "Usuario registrado con éxito");
-      })
-      .catch((error) => {
+    try {
+      // Crear usuario en Firebase Authentication
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Guardar datos adicionales en Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        fullName: fullName,
+        username: username,
+        email: email,
+        rut: rut // Guardar el RUT también
+      });
+
+      setMessage("Usuario registrado con éxito!");
+      console.log("Usuario registrado:", userCredential.user);
+      Alert.alert("Éxito", "Usuario registrado con éxito");
+    } catch (error) {
+      if (error instanceof Error) {
+        // Ahora puedes acceder de manera segura a error.message
         setMessage(`Error: ${error.message}`);
         Alert.alert("Error", error.message);
         console.error("Error al registrar el usuario:", error);
-      });
+      } else {
+        // Si el error no es una instancia de Error, maneja el caso de forma genérica
+        setMessage("Ocurrió un error inesperado");
+        Alert.alert("Error", "Ocurrió un error inesperado");
+        console.error("Error desconocido:", error);
+      }
+    }
   };
 
   return (
@@ -40,7 +60,7 @@ const RegisterScreen = () => {
       <TextInput
         value={email}
         onChangeText={setEmail}
-        placeholder="Correo Electronico"
+        placeholder="Correo Electrónico"
         keyboardType="email-address"
         autoCapitalize="none"
         style={styles.input}
@@ -50,6 +70,14 @@ const RegisterScreen = () => {
         value={fullName}
         onChangeText={setFullName}
         placeholder="Nombre Completo"
+        style={styles.input}
+      />
+
+      {/* Campo de RUT con formato predefinido */}
+      <TextInput
+        value={rut}
+        onChangeText={setRut}
+        placeholder="Ej: 21112344-4" // Formato predefinido
         style={styles.input}
       />
 
