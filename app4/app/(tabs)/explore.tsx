@@ -4,12 +4,14 @@ import { CheckBox } from 'react-native-elements'; // Nueva importación de Check
 import { Ionicons } from '@expo/vector-icons';
 import { signInWithEmailAndPassword } from 'firebase/auth'; // Importar el método de autenticación
 import { auth } from '@/scripts/firebaseConfig'; // Importar la configuración de Firebase
+import { useRouter } from 'expo-router'; // Importar el hook useRouter para la navegación
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 
 export default function ExploreScreen() {
+  const router = useRouter(); // Hook para navegación
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
@@ -97,7 +99,7 @@ export default function ExploreScreen() {
           </TouchableOpacity>
 
           {/* Enlace para "¿Olvidaste tu contraseña?" */}
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => router.push('/recuperar')}>
             <ThemedText style={styles.forgotPasswordText}>¿Olvidaste tu contraseña?</ThemedText>
           </TouchableOpacity>
         </View>
@@ -105,7 +107,7 @@ export default function ExploreScreen() {
         {/* Enlace para "Crea una cuenta" */}
         <View style={styles.signupContainer}>
           <ThemedText type="default">¿No tienes una cuenta? </ThemedText>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => router.push('/register')}>
             <ThemedText type="defaultSemiBold" style={styles.signupLink}>Crea una cuenta</ThemedText>
           </TouchableOpacity>
         </View>

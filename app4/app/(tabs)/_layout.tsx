@@ -10,19 +10,12 @@ export default function TabLayout() {
 
   return (
     <Tabs
+      initialRouteName="explore" // Establece "explore" como la pantalla inicial
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
+        headerShown: false, // Oculta el header (barra de navegación superior)
+        tabBarStyle: { display: 'none' }, // Oculta la barra de pestañas si lo deseas
       }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color} />
-          ),
-        }}
-      />
       <Tabs.Screen
         name="explore"
         options={{
@@ -33,24 +26,32 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-          name="register"
-          options={{
-            title: 'Register',
-            tabBarIcon: ({ color, focused }) => (
-              <TabBarIcon name={focused ? 'person-add' : 'person-add-outline'} color={color} />
-            ),
-          }}
-        />
-
+        name="index"
+        options={{
+          title: 'Home',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color} />
+          ),
+        }}
+      />
       <Tabs.Screen
-          name="recuperar"
-          options={{
-            title: 'Recuperar',
-            tabBarIcon: ({ color, focused }) => (
-              <TabBarIcon name={focused ? 'person-add' : 'person-add-outline'} color={color} />
-            ),
-          }}
-        />
+        name="register"
+        options={{
+          title: 'Register',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'person-add' : 'person-add-outline'} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="recuperar"
+        options={{
+          title: 'Recuperar',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'person-add' : 'person-add-outline'} color={color} />
+          ),
+        }}
+      />
     </Tabs>
   );
 }
