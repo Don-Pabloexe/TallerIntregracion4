@@ -10,21 +10,13 @@ export default function TabLayout() {
 
   return (
     <Tabs
-      initialRouteName="explore" // Establece "explore" como la pantalla inicial
+      initialRouteName="index" // Establece "explore" como la pantalla inicial
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false, // Oculta el header (barra de navegación superior)
         tabBarStyle: { display: 'none' }, // Oculta la barra de pestañas si lo deseas
       }}>
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
-          ),
-        }}
-      />
+     
       <Tabs.Screen
         name="index"
         options={{

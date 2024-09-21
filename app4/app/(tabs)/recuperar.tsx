@@ -3,9 +3,11 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'reac
 import { Ionicons } from '@expo/vector-icons'; // Para el ícono del candado
 import { sendPasswordResetEmail } from 'firebase/auth'; // Función de Firebase
 import { auth } from '../../scripts/firebaseConfig'; // Asegúrate de que la ruta sea correcta
+import { useRouter } from 'expo-router';
 
 const ForgotPasswordScreen = () => {
   const [email, setEmail] = useState('');
+  const router = useRouter();
 
   const handlePasswordReset = () => {
     if (!email) {
@@ -47,8 +49,9 @@ const ForgotPasswordScreen = () => {
       </TouchableOpacity>
 
       {/* Este botón ya no usa navegación */}
-      <TouchableOpacity style={styles.backButton}>
+      <TouchableOpacity style={styles.backButton} onPress={() => router.push('/')}>
         <Text style={styles.backButtonText}>Volver a inicio de sesión</Text>
+        
       </TouchableOpacity>
     </View>
   );

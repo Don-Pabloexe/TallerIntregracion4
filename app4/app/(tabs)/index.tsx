@@ -11,7 +11,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 
-export default function ExploreScreen() {
+export default function indexScreen() {
   const router = useRouter(); // Hook para navegación
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -117,6 +117,14 @@ export default function ExploreScreen() {
           </TouchableOpacity>
         </Animated.View>
 
+        {/* Enlace para "Crea una cuenta" */}
+        <View style={styles.signupContainer}>
+          <ThemedText type="default">¿No tienes una cuenta? </ThemedText>
+          <TouchableOpacity onPress={() => router.push('/register')}>
+            <ThemedText type="defaultSemiBold" style={styles.signupLink}>Crea una cuenta</ThemedText>
+          </TouchableOpacity>
+        </View>
+
         {/* Modal de carga que se muestra cuando está iniciando sesión */}
         <Modal transparent={true} visible={isLoggingIn} animationType="fade">
           <View style={styles.modalBackground}>
@@ -201,6 +209,15 @@ const styles = StyleSheet.create({
     color: '#A6A6A6',
     fontSize: 14,
     marginTop: 10,
+  },
+  signupContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 20,
+  },
+  signupLink: {
+    color: '#00BFA6',
+    fontWeight: 'bold',
   },
   modalBackground: {
     flex: 1,
