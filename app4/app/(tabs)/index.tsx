@@ -5,13 +5,13 @@ import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import ProductCarousel from './carousel';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { ProductScreen, products, otros } from './barrido';
 import * as Font from 'expo-font';
 import AppLoading from 'expo-app-loading';
-import Cart from './Cart';
+import Cart from '../Cart';
+import { CartProvider } from '@/context/CartContext';
 
 const Stack = createStackNavigator();
 
@@ -35,7 +35,7 @@ export default function HomeScreen() {
   }
 
   return (
-   
+    
      <ProductScreen products={products} />
      
   );

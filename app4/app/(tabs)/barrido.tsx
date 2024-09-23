@@ -1,8 +1,11 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Dimensions, ScrollView, Image, FlatList } from 'react-native';
-import Cart from './Cart';
-import ProductItem from './ProductItem';
+import { View, Text, StyleSheet, Dimensions, ScrollView, Image, FlatList, TouchableOpacity } from 'react-native';
+import Cart from '../Cart';
 import { BlurView } from 'expo-blur';
+import { useCart } from '@/context/CartContext';
+import { Ionicons } from '@expo/vector-icons';
+
+
 const { width: screenWidth } = Dimensions.get('window');
 
 
@@ -55,6 +58,8 @@ const HorizontalProductCarousel = ({ products }) => {
 
 // Componente para la lista vertical
 const VerticalProductList = ({ products }) => {
+  const { addItem } = useCart(); // Obtener la función addItem del contexto
+
   const renderItem = ({ item }) => (
     <View style={styles.verticalCard}>
       {item.image && (
@@ -62,9 +67,20 @@ const VerticalProductList = ({ products }) => {
       )}
       <Text style={styles.title}>{item.name}</Text>
       <Text style={styles.price}>${item.price}</Text>
-      <View style={styles.cartButton}>{item.cart}</View>
+      <TouchableOpacity 
+        onPress={() => addItem({ image: item.image, name: item.name, price: item.price })} 
+        style={styles.cartButton}
+      >
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Ionicons name="add-circle-outline" size={20} color="#fff" />
+          <Text style={{ color: '#fff', marginLeft: 5 }}>Agregar</Text>
+        </View>
+      </TouchableOpacity>
+
+
     </View>
   );
+  
 
   return (
     <View style={styles.section}>
@@ -73,7 +89,7 @@ const VerticalProductList = ({ products }) => {
         data={products}
         renderItem={renderItem}
         keyExtractor={(item, index) => index.toString()}
-        numColumns={2} // Establece el número de columnas
+        numColumns={2}
         contentContainerStyle={styles.flatListContainer}
       />
     </View>
@@ -114,54 +130,15 @@ const products = [
 ];
 
 const otros = [
-  {
-    image: require('./../../assets/images/takis.jpeg'),
-    name: 'Takis',
-    price: 1.20,
-    cart: <Cart/>
-  },
-  {
-    image: require('./../../assets/images/ramitas.png'),
-    name: 'Ramitas',
-    price: 0.80,
-    cart: <Cart/>
-  },
-  {
-    image: require('./../../assets/images/coca.jpg'),
-    name: 'Coca-Cola',
-    price: 1.50,
-    cart: <Cart/>
-  },
-  {
-    image: require('./../../assets/images/lays.png'),
-    name: 'Lays',
-    price: 1.30,
-    cart: <Cart/>
-  },
-  {
-    image: require('./../../assets/images/takis.jpeg'),
-    name: 'Takis',
-    price: 1.20,
-    cart: <Cart/>
-  },
-  {
-    image: require('./../../assets/images/ramitas.png'),
-    name: 'Ramitas',
-    price: 0.80,
-    cart: <Cart/>
-  },
-  {
-    image: require('./../../assets/images/coca.jpg'),
-    name: 'Coca-Cola',
-    price: 1.50,
-    cart: <Cart/>
-  },
-  {
-    image: require('./../../assets/images/lays.png'),
-    name: 'Lays',
-    price: 1.30,
-    cart: <Cart/>
-  }
+  {image: require('./../../assets/images/takis.jpeg'), name: 'Takis', price: 1.20,},
+  {image: require('./../../assets/images/ramitas.png'), name: 'Ramitas', price: 0.80,},
+  {image: require('./../../assets/images/coca.jpg'),name: 'Coca-Cola',price: 1.50,},
+  {image: require('./../../assets/images/lays.png'),name: 'Lays',price: 1.30,},
+  {image: require('./../../assets/images/takis.jpeg'), name: 'Takis', price: 1.20,},
+  {image: require('./../../assets/images/ramitas.png'), name: 'Ramitas', price: 0.80,},
+  {image: require('./../../assets/images/coca.jpg'),name: 'Coca-Cola',price: 1.50,},
+  {image: require('./../../assets/images/lays.png'),name: 'Lays',price: 1.30,},
+  
 ];
 
 const styles = StyleSheet.create({
@@ -240,7 +217,11 @@ const styles = StyleSheet.create({
     color: '#888',
   },
   cartButton: {
+    backgroundColor: '#0085A5', // Color de fondo para hacer el botón más visible
+    padding: 10,
+    borderRadius: 5,
     marginTop: 10,
+    alignItems: 'center',
   },
   flatListContainer: {
     paddingVertical: 5,
