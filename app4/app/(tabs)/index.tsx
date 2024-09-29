@@ -2,16 +2,15 @@ import React, { useState } from 'react';
 import { View, TextInput, StyleSheet, Image, TouchableOpacity, Alert, Modal, ActivityIndicator } from 'react-native';
 import { CheckBox } from 'react-native-elements';
 import { Ionicons } from '@expo/vector-icons';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '@/scripts/firebaseConfig';
 import { useRouter } from 'expo-router';
 import Animated, { SlideInLeft, SlideOutRight } from 'react-native-reanimated'; // Animaciones
+import axios from 'axios'; // Usaremos axios para hacer peticiones HTTP
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 
-export default function indexScreen() {
+export default function IndexScreen() {
   const router = useRouter(); // Hook para navegación
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -19,16 +18,19 @@ export default function indexScreen() {
   const [isLoggingIn, setIsLoggingIn] = useState(false); // Estado para mostrar el modal de carga
 
   const handleLogin = async () => {
-    // Mostrar el modal de carga
     setIsLoggingIn(true);
 
     try {
-      // Intentar iniciar sesión con Firebase
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
+      // Petición al backend para iniciar sesión
+      const response = await axios.post('http://localhost:5000/login', {
+        email,
+        password
+      });
+
+      const { user } = response.data;
 
       // Mostrar una alerta que indica que la sesión se inició correctamente
-      Alert.alert('Inicio de sesión exitoso', `Bienvenido, ${user.email}`);
+      Alert.alert('Inicio de sesión exitoso', `Bienvenido, ${user.username}`);
 
       // Después de un pequeño retraso, redirigir al Home
       setTimeout(() => {
@@ -38,10 +40,13 @@ export default function indexScreen() {
     } catch (error) {
       // Manejar errores de inicio de sesión
       setIsLoggingIn(false); // Ocultar el modal de carga en caso de error
-      if (error instanceof Error) {
-        console.log('Error de inicio de sesión:', error.message);
-        Alert.alert('Error', error.message);
+
+      if (error.response) {
+        // Error desde el servidor
+        console.log('Error de inicio de sesión:', error.response.data);
+        Alert.alert('Error', error.response.data);
       } else {
+        // Error inesperado
         console.log('Error inesperado durante el inicio de sesión.');
         Alert.alert('Error', 'Ocurrió un error inesperado.');
       }

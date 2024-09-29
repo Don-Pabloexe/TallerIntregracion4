@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { Text, TextInput, TouchableOpacity, View, StyleSheet, Alert } from "react-native";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "../../scripts/firebaseConfig"; // Importar Firestore también
-import { doc, setDoc } from "firebase/firestore"; // Para guardar datos en Firestore
+import axios from "axios"; // Importa axios para hacer peticiones HTTP
 import { Ionicons } from "@expo/vector-icons"; // Para los iconos de contraseña
+import { useRouter } from "expo-router"; // Para manejar la navegación
 
 const RegisterScreen = () => {
+  const router = useRouter(); // Hook para navegación
   const [email, setEmail] = useState("");
-  const [fullName, setFullName] = useState("");
+  const [fullname, setFullname] = useState("");
   const [username, setUsername] = useState("");
   const [rut, setRut] = useState(""); // Nuevo campo de RUT
   const [password, setPassword] = useState("");
@@ -23,33 +23,24 @@ const RegisterScreen = () => {
     }
 
     try {
-      // Crear usuario en Firebase Authentication
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
-      // Guardar datos adicionales en Firestore
-      await setDoc(doc(db, "users", user.uid), {
-        fullName: fullName,
-        username: username,
-        email: email,
-        rut: rut // Guardar el RUT también
+      // Hacer la solicitud POST al servidor para registrar el usuario
+      const response = await axios.post('http://localhost:5000/register', {
+        email,
+        fullname,
+        username,
+        rut,
+        password
       });
 
       setMessage("Usuario registrado con éxito!");
-      console.log("Usuario registrado:", userCredential.user);
       Alert.alert("Éxito", "Usuario registrado con éxito");
+      
+      // Navegar de regreso al inicio de sesión
+      router.push('/');
+      
     } catch (error) {
-      if (error instanceof Error) {
-        // Ahora puedes acceder de manera segura a error.message
-        setMessage(`Error: ${error.message}`);
-        Alert.alert("Error", error.message);
-        console.error("Error al registrar el usuario:", error);
-      } else {
-        // Si el error no es una instancia de Error, maneja el caso de forma genérica
-        setMessage("Ocurrió un error inesperado");
-        Alert.alert("Error", "Ocurrió un error inesperado");
-        console.error("Error desconocido:", error);
-      }
+      console.error('Error al registrar el usuario:', error);
+      Alert.alert("Error", error.response?.data?.message || "Error al registrar el usuario");
     }
   };
 
@@ -67,8 +58,8 @@ const RegisterScreen = () => {
       />
 
       <TextInput
-        value={fullName}
-        onChangeText={setFullName}
+        value={fullname}
+        onChangeText={setFullname}
         placeholder="Nombre Completo"
         style={styles.input}
       />
@@ -77,7 +68,7 @@ const RegisterScreen = () => {
       <TextInput
         value={rut}
         onChangeText={setRut}
-        placeholder="Ej: 21112344-4" // Formato predefinido
+        placeholder="Ej: 21112344-4"
         style={styles.input}
       />
 
@@ -135,6 +126,11 @@ const RegisterScreen = () => {
         <Text style={styles.registerButtonText}>Crear Cuenta</Text>
       </TouchableOpacity>
 
+      {/* Botón para volver al inicio */}
+      <TouchableOpacity style={styles.backButton} onPress={() => router.push('/')}>
+        <Text style={styles.backButtonText}>Volver al Inicio</Text>
+      </TouchableOpacity>
+
       {message ? <Text style={styles.message}>{message}</Text> : null}
     </View>
   );
@@ -189,6 +185,19 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   registerButtonText: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  backButton: {
+    backgroundColor: "#A6A6A6",
+    width: "100%",
+    padding: 15,
+    borderRadius: 25,
+    alignItems: "center",
+    marginTop: 10,
+  },
+  backButtonText: {
     color: "#FFFFFF",
     fontSize: 18,
     fontWeight: "bold",
