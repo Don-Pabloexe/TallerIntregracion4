@@ -10,10 +10,13 @@ export default function TabLayout() {
 
   return (
     <Tabs
+      initialRouteName="index" // Establece "explore" como la pantalla inicial
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
+        headerShown: false, // Oculta el header (barra de navegación superior)
+        tabBarStyle: { display: 'none' }, // Oculta la barra de pestañas si lo deseas
       }}>
+     
       <Tabs.Screen
         name="index"
         options={{
@@ -24,33 +27,36 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="register"
         options={{
-          title: 'Explore',
+          title: 'Register',
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
+            <TabBarIcon name={focused ? 'person-add' : 'person-add-outline'} color={color} />
           ),
         }}
       />
       <Tabs.Screen
-          name="register"
-          options={{
-            title: 'Register',
-            tabBarIcon: ({ color, focused }) => (
-              <TabBarIcon name={focused ? 'person-add' : 'person-add-outline'} color={color} />
-            ),
-          }}
-        />
-
-      <Tabs.Screen
-          name="recuperar"
-          options={{
-            title: 'Recuperar',
-            tabBarIcon: ({ color, focused }) => (
-              <TabBarIcon name={focused ? 'person-add' : 'person-add-outline'} color={color} />
-            ),
-          }}
-        />
+        name="recuperar"
+        options={{
+          title: 'Recuperar',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'person-add' : 'person-add-outline'} color={color} />
+          ),
+        }}
+      />
     </Tabs>
+
+<Tabs.Screen
+name="Profile"
+component={UserProfile}
+options={{
+  title: 'Perfil',
+  tabBarIcon: ({ color, focused }) => (
+    <TabBarIcon name={focused ? 'ios-person' : 'ios-person-outline'} color={color} />
+  ),
+}}
+/>
+
   );
+  
 }

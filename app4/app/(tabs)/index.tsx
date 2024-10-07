@@ -1,107 +1,244 @@
 import React, { useState } from 'react';
-import { Image, StyleSheet, TouchableOpacity, View, Text, ScrollView, Animated } from 'react-native';
-import { HelloWave } from '@/components/HelloWave';
+import { View, TextInput, StyleSheet, Image, TouchableOpacity, Alert, Modal, ActivityIndicator } from 'react-native';
+import { CheckBox } from 'react-native-elements';
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import Animated, { SlideInLeft, SlideOutRight } from 'react-native-reanimated'; // Animaciones
+import axios from 'axios'; // Usaremos axios para hacer peticiones HTTP
+
 import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
+import ParallaxScrollView from '@/components/ParallaxScrollView';
 
-interface CategoryButtonProps {
-  label: string;
-}
+export default function IndexScreen() {
+  const router = useRouter(); // Hook para navegación
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
+  const [isLoggingIn, setIsLoggingIn] = useState(false); // Estado para mostrar el modal de carga
 
-const categories = [
-  'Regalos y más',
-  'Comida',
-  'Mercados',
-  'Lo que sea',
-  'Algo Dulce',
-  'Farmacia',
-  'Recoger o Enviar'
-];
+  const handleLogin = async () => {
+    setIsLoggingIn(true);
 
-const CategoryButton: React.FC<CategoryButtonProps> = ({ label }) => {
-  const [scale, setScale] = useState(new Animated.Value(1));
+    try {
+      // Petición al backend para iniciar sesión
+      const response = await axios.post('http://localhost:5000/login', {
+        email,
+        password
+      });
 
-  const onPressIn = () => {
-    Animated.spring(scale, {
-      toValue: 0.95,
-      useNativeDriver: true
-    }).start();
-  };
+      const { user } = response.data;
 
-  const onPressOut = () => {
-    Animated.spring(scale, {
-      toValue: 1,
-      useNativeDriver: true,
-      friction: 3,
-      tension: 100
-    }).start();
+      // Mostrar una alerta que indica que la sesión se inició correctamente
+      Alert.alert('Inicio de sesión exitoso', `Bienvenido, ${user.username}`);
+
+      // Después de un pequeño retraso, redirigir al Home
+      setTimeout(() => {
+        setIsLoggingIn(false); // Ocultar el modal de carga
+        router.push('/home'); // Redirige al Home
+      }, 1000); // Esperar 1 segundo para completar la transición
+    } catch (error) {
+      // Manejar errores de inicio de sesión
+      setIsLoggingIn(false); // Ocultar el modal de carga en caso de error
+
+      if (error.response) {
+        // Error desde el servidor
+        console.log('Error de inicio de sesión:', error.response.data);
+        Alert.alert('Error', error.response.data);
+      } else {
+        // Error inesperado
+        console.log('Error inesperado durante el inicio de sesión.');
+        Alert.alert('Error', 'Ocurrió un error inesperado.');
+      }
+    }
   };
 
   return (
-    <Animated.View style={[styles.button, { transform: [{ scale }] }]}>
-      <TouchableOpacity onPressIn={onPressIn} onPressOut={onPressOut}>
-        <Text style={styles.buttonText}>{label}</Text>
-      </TouchableOpacity>
-    </Animated.View>
-  );
-};
+    <ParallaxScrollView
+      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
+      headerImage={
+        <Image
+          source={require('@/assets/images/partial-react-logo.png')} // Placeholder para el logo
+          style={styles.logo}
+        />
+      }
+    >
+      <ThemedView style={styles.centeredContainer}>
+        <Animated.View
+          entering={SlideInLeft.duration(500)} // Animación de entrada
+          exiting={SlideOutRight.duration(500)} // Animación de salida
+          style={styles.formBox}
+        >
+          <ThemedText type="title" style={styles.titleText}>
+            Inicio de Sesión
+          </ThemedText>
 
-export default function HomeScreen() {
-  return (
-    <ScrollView style={styles.container}>
-      <Image
-        source={require('@/assets/images/partial-react-logo.png')}
-        style={styles.headerImage}
-      />
-      <View style={styles.welcomeContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </View>
-      <View style={styles.categoriesContainer}>
-        {categories.map((category, index) => (
-          <CategoryButton key={index} label={category} />
-        ))}
-      </View>
-    </ScrollView>
+          {/* Campo de Correo */}
+          <View style={styles.inputContainer}>
+            <Ionicons name="person-outline" size={24} color="#A6A6A6" />
+            <TextInput
+              style={styles.input}
+              placeholder="Correo"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+          </View>
+
+          {/* Campo de Contraseña */}
+          <View style={styles.inputContainer}>
+            <Ionicons name="lock-closed-outline" size={24} color="#A6A6A6" />
+            <TextInput
+              style={styles.input}
+              placeholder="Contraseña"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+            />
+          </View>
+
+          {/* Checkbox para "Recordar mi contraseña" */}
+          <View style={styles.rememberMeContainer}>
+            <CheckBox
+              title="Recordar mi contraseña"
+              checked={rememberMe}
+              onPress={() => setRememberMe(!rememberMe)}
+              containerStyle={styles.checkboxContainer}
+              textStyle={styles.checkboxLabel}
+              checkedColor="#00BFA6"
+              uncheckedColor="#A6A6A6"
+            />
+          </View>
+
+          {/* Botón de Acceder */}
+          <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+            <ThemedText style={styles.loginButtonText}>Acceder</ThemedText>
+          </TouchableOpacity>
+
+          {/* Enlace para "¿Olvidaste tu contraseña?" */}
+          <TouchableOpacity onPress={() => router.push('/recuperar')}>
+            <ThemedText style={styles.forgotPasswordText}>¿Olvidaste tu contraseña?</ThemedText>
+          </TouchableOpacity>
+        </Animated.View>
+
+        {/* Enlace para "Crea una cuenta" */}
+        <View style={styles.signupContainer}>
+          <ThemedText type="default">¿No tienes una cuenta? </ThemedText>
+          <TouchableOpacity onPress={() => router.push('/register')}>
+            <ThemedText type="defaultSemiBold" style={styles.signupLink}>Crea una cuenta</ThemedText>
+          </TouchableOpacity>
+        </View>
+
+        {/* Modal de carga que se muestra cuando está iniciando sesión */}
+        <Modal transparent={true} visible={isLoggingIn} animationType="fade">
+          <View style={styles.modalBackground}>
+            <View style={styles.modalContainer}>
+              <ActivityIndicator size="large" color="#00BFA6" />
+              <ThemedText style={styles.loadingText}>Iniciando sesión...</ThemedText>
+            </View>
+          </View>
+        </Modal>
+      </ThemedView>
+    </ParallaxScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'white',
-  },
-  headerImage: {
-    width: '100%',
-    height: 200,
-    resizeMode: 'cover',
-  },
-  welcomeContainer: {
-    alignItems: 'center',
-    padding: 20,
-  },
-  categoriesContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-evenly',
-    padding: 20,
-  },
-  button: {
-    backgroundColor: 'skyblue',
-    borderRadius: 50,
-    width: 100,
+  logo: {
     height: 100,
+    width: 100,
+    marginBottom: 20,
+    alignSelf: 'center',
+  },
+  centeredContainer: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    margin: 10,
-    elevation: 5,  // Sombra para Android
-    shadowColor: '#000', // Sombra para iOS
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
   },
-  buttonText: {
+  formBox: {
+    width: '85%',
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 10,
+    elevation: 3,
+    alignItems: 'center',
+  },
+  titleText: {
+    marginBottom: 20,
+    fontSize: 24,
     textAlign: 'center',
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F0F0F0',
+    paddingHorizontal: 10,
+    paddingVertical: 15,
+    borderRadius: 5,
+    marginBottom: 15,
+    width: '100%',
+  },
+  input: {
+    flex: 1,
+    marginLeft: 10,
+    fontSize: 16,
+  },
+  rememberMeContainer: {
+    marginBottom: 15,
+    width: '100%',
+  },
+  checkboxContainer: {
+    backgroundColor: 'transparent',
+    borderWidth: 0,
+    paddingLeft: 0,
+  },
+  checkboxLabel: {
+    fontSize: 16,
+    color: '#A6A6A6',
+  },
+  loginButton: {
+    backgroundColor: '#00BFA6',
+    paddingVertical: 15,
+    borderRadius: 5,
+    alignItems: 'center',
+    width: '100%',
+    marginBottom: 15,
+  },
+  loginButtonText: {
+    color: '#fff',
+    fontSize: 18,
     fontWeight: 'bold',
+  },
+  forgotPasswordText: {
+    color: '#A6A6A6',
     fontSize: 14,
-  }
+    marginTop: 10,
+  },
+  signupContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 20,
+  },
+  signupLink: {
+    color: '#00BFA6',
+    fontWeight: 'bold',
+  },
+  modalBackground: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fondo transparente y oscuro
+  },
+  modalContainer: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 18,
+    color: '#00BFA6',
+  },
 });

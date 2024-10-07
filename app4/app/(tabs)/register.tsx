@@ -1,36 +1,47 @@
 import React, { useState } from "react";
 import { Text, TextInput, TouchableOpacity, View, StyleSheet, Alert } from "react-native";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../scripts/firebaseConfig"; // Asegúrate de la ruta correcta
+import axios from "axios"; // Importa axios para hacer peticiones HTTP
 import { Ionicons } from "@expo/vector-icons"; // Para los iconos de contraseña
+import { useRouter } from "expo-router"; // Para manejar la navegación
 
 const RegisterScreen = () => {
+  const router = useRouter(); // Hook para navegación
   const [email, setEmail] = useState("");
-  const [fullName, setFullName] = useState("");
+  const [fullname, setFullname] = useState("");
   const [username, setUsername] = useState("");
+  const [rut, setRut] = useState(""); // Nuevo campo de RUT
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [message, setMessage] = useState("");
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     if (password !== confirmPassword) {
       Alert.alert("Error", "Las contraseñas no coinciden");
       return;
     }
 
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        setMessage("Usuario registrado con éxito!");
-        console.log("Usuario registrado:", userCredential.user);
-        Alert.alert("Éxito", "Usuario registrado con éxito");
-      })
-      .catch((error) => {
-        setMessage(`Error: ${error.message}`);
-        Alert.alert("Error", error.message);
-        console.error("Error al registrar el usuario:", error);
+    try {
+      // Hacer la solicitud POST al servidor para registrar el usuario
+      const response = await axios.post('http://localhost:5000/register', {
+        email,
+        fullname,
+        username,
+        rut,
+        password
       });
+
+      setMessage("Usuario registrado con éxito!");
+      Alert.alert("Éxito", "Usuario registrado con éxito");
+      
+      // Navegar de regreso al inicio de sesión
+      router.push('/');
+      
+    } catch (error) {
+      console.error('Error al registrar el usuario:', error);
+      Alert.alert("Error", error.response?.data?.message || "Error al registrar el usuario");
+    }
   };
 
   return (
@@ -40,16 +51,24 @@ const RegisterScreen = () => {
       <TextInput
         value={email}
         onChangeText={setEmail}
-        placeholder="Correo Electronico"
+        placeholder="Correo Electrónico"
         keyboardType="email-address"
         autoCapitalize="none"
         style={styles.input}
       />
 
       <TextInput
-        value={fullName}
-        onChangeText={setFullName}
+        value={fullname}
+        onChangeText={setFullname}
         placeholder="Nombre Completo"
+        style={styles.input}
+      />
+
+      {/* Campo de RUT con formato predefinido */}
+      <TextInput
+        value={rut}
+        onChangeText={setRut}
+        placeholder="Ej: 21112344-4"
         style={styles.input}
       />
 
@@ -107,6 +126,11 @@ const RegisterScreen = () => {
         <Text style={styles.registerButtonText}>Crear Cuenta</Text>
       </TouchableOpacity>
 
+      {/* Botón para volver al inicio */}
+      <TouchableOpacity style={styles.backButton} onPress={() => router.push('/')}>
+        <Text style={styles.backButtonText}>Volver al Inicio</Text>
+      </TouchableOpacity>
+
       {message ? <Text style={styles.message}>{message}</Text> : null}
     </View>
   );
@@ -161,6 +185,19 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   registerButtonText: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  backButton: {
+    backgroundColor: "#A6A6A6",
+    width: "100%",
+    padding: 15,
+    borderRadius: 25,
+    alignItems: "center",
+    marginTop: 10,
+  },
+  backButtonText: {
     color: "#FFFFFF",
     fontSize: 18,
     fontWeight: "bold",
