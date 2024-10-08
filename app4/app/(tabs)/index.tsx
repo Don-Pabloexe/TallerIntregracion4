@@ -7,7 +7,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { ProductScreen, products, otros } from './barrido';
+import { ProductScreen} from './ProductScreen';
 import * as Font from 'expo-font';
 import AppLoading from 'expo-app-loading';
 import Cart from '../Cart';
@@ -36,7 +36,7 @@ export default function HomeScreen() {
 
   return (
     
-     <ProductScreen products={products} />
+     <ProductScreen />
      
   );
 }
