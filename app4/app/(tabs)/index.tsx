@@ -1,17 +1,15 @@
-import { Image, StyleSheet, Platform, View, Text } from 'react-native';
+import { Image, StyleSheet, View, Text } from 'react-native';
 import { useState, useEffect } from 'react';
-import { AppRegistry } from 'react-native';
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { ProductScreen} from './ProductScreen';
 import * as Font from 'expo-font';
 import AppLoading from 'expo-app-loading';
-import Cart from '../Cart';
+import { HelloWave } from '@/components/HelloWave'; // Asegúrate de que HelloWave sea un componente válido
+import { ProductScreen } from './ProductScreen';
+import { BrandScreen } from './BrandScreen.tsx';
 import { CartProvider } from '@/context/CartContext';
+import 'react-native-gesture-handler';
+import CartScreen from './CartScreen';
 
 const Stack = createStackNavigator();
 
@@ -21,7 +19,7 @@ export default function HomeScreen() {
   // Cargar la fuente personalizada
   const loadFonts = async () => {
     await Font.loadAsync({
-      'CustomFont': require('./../../assets/fonts/ProtestGuerrilla-Regular.ttf'), // Cambia por el nombre de tu fuente
+      'CustomFont': require('./../../assets/fonts/ProtestGuerrilla-Regular.ttf'),
     });
     setFontsLoaded(true);
   };
@@ -35,9 +33,12 @@ export default function HomeScreen() {
   }
 
   return (
+        <Stack.Navigator initialRouteName="Products">
+          <Stack.Screen name="Products" component={ProductScreen} />
+          <Stack.Screen name="BrandProducts" component={BrandScreen} />
+          <Stack.Screen name="Cart" component={CartScreen} />
+        </Stack.Navigator>
     
-     <ProductScreen />
-     
   );
 }
 

@@ -2,57 +2,62 @@ import React, { useEffect, useState, useRef } from 'react';
 import { View, ScrollView, FlatList, Text, Image, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useCart } from '@/context/CartContext';
+import { useNavigation } from '@react-navigation/native';
 
 const { width: screenWidth } = Dimensions.get('window');
 
 // Componente para el carrusel horizontal
 const HorizontalProductCarousel = ({ products }) => {
-    const scrollViewRef = useRef(null);
-    const [currentIndex, setCurrentIndex] = useState(0);
-  
-    useEffect(() => {
-      const interval = setInterval(() => {
-        // Avanza al siguiente producto o vuelve al primero si es el último
-        const nextIndex = currentIndex === products.length - 1 ? 0 : currentIndex + 1;
-  
-        // Desliza al siguiente producto
-        scrollViewRef.current?.scrollTo({
-          x: nextIndex * screenWidth -30, // Multiplica por el ancho de cada tarjeta
-          animated: true,
-        });
-  
-        setCurrentIndex(nextIndex);
-      }, 3000); // Cambia el tiempo en milisegundos según tus preferencias (3 segundos en este caso)
-  
-      return () => clearInterval(interval); // Limpia el intervalo cuando el componente se desmonta
-    }, [currentIndex, products.length]);
-  
-    return (
-      
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Marcas</Text>
-        <ScrollView
-  ref={scrollViewRef}
-  horizontal
-  pagingEnabled
-  showsHorizontalScrollIndicator={false}
-  contentContainerStyle={styles.scrollViewContainer}
->
-  {products.map((item, index) => (
-    <View key={index} style={styles.card}>
-      {item.imagen && (
-        <Image source={{ uri: item.imagen }} style={styles.image} />
-      )}
-      {/* Asegúrate de envolver los nombres y precios dentro de <Text> */}
-      <Text style={styles.title}>{item.nombre}</Text>
-      <Text style={styles.price}>${item.precio}</Text>
-    </View>
-  ))}
-</ScrollView>
+  const scrollViewRef = useRef(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const navigation = useNavigation(); // Hook de navegación
 
-      </View>
-    );
-  };
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // Avanza al siguiente producto o vuelve al primero si es el último
+      const nextIndex = currentIndex === products.length - 1 ? 0 : currentIndex + 1;
+
+      // Desliza al siguiente producto
+      scrollViewRef.current?.scrollTo({
+        x: nextIndex * screenWidth - 30, // Multiplica por el ancho de cada tarjeta
+        animated: true,
+      });
+
+      setCurrentIndex(nextIndex);
+    }, 3000); // Cambia el tiempo en milisegundos según tus preferencias (3 segundos en este caso)
+
+    return () => clearInterval(interval); // Limpia el intervalo cuando el componente se desmonta
+  }, [currentIndex, products.length]);
+
+  return (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>Marcas</Text>
+      <ScrollView
+        ref={scrollViewRef}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.scrollViewContainer}
+      >
+        {products.map((item, index) => (
+          <TouchableOpacity
+            key={index}
+            style={styles.card}
+            onPress={() => {
+              // Navega a la pantalla de productos de la marca específica
+              navigation.navigate('BrandProducts', { brandId: item.id });
+            }}
+          >
+            {item.imagen && (
+              <Image source={{ uri: item.imagen }} style={styles.image} />
+            )}
+            <Text style={styles.title}>{item.nombre}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+    </View>
+  );
+};
 
 // Componente para la lista vertical
 const VerticalProductList = ({ products }) => {
@@ -65,7 +70,9 @@ const VerticalProductList = ({ products }) => {
       <Text style={styles.title}>{item.nombre}</Text>
       <Text style={styles.price}>${item.precio}</Text>
       <TouchableOpacity
-        onPress={() => addItem({ image: item.imagen, name: item.nombre, price: item.precio })}
+         onPress={() => {
+          addItem({ image: item.imagen, name: item.nombre, price: item.precio });
+        }}
         style={styles.cartButton}
       >
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -100,9 +107,11 @@ const ProductScreen = () => {
     // Función para obtener productos desde el backend
     const fetchProducts = async () => {
       try {
+        const res = await fetch('http://192.168.163.9:3000/marcas');
+        const dat = await res.json();
         const response = await fetch('http://192.168.163.9:3000/products');
         const data = await response.json();
-        setProducts(data);
+        setProducts(dat);
         setOtros(data); // Puedes ajustar esto según el tipo de productos
       } catch (error) {
         console.error('Error fetching products:', error);
