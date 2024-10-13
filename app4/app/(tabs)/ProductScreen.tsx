@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, ScrollView, FlatList, Text, Image, StyleSheet, TouchableOpacity, Dimensions, Alert } from 'react-native';
+import { View, ScrollView, FlatList, Text, Image, StyleSheet, TouchableOpacity, Dimensions, Alert} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useCart } from '../(tabs)/CartContext';
 import { useRouter } from 'expo-router'; // Importar useRouter para Expo Router
@@ -101,8 +101,7 @@ const VerticalProductList: React.FC<{ products: Product[] }> = ({ products }) =>
   );
 };
 
-// Definimos el componente principal y usamos export default
-export default function HomeScreen() {
+const ProductScreen = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [otros, setOtros] = useState<Product[]>([]);
 
@@ -134,7 +133,7 @@ export default function HomeScreen() {
       <VerticalProductList products={otros} />
     </ScrollView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -221,3 +220,5 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
   },
 });
+
+export { ProductScreen };
