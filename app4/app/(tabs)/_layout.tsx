@@ -12,40 +12,51 @@ export default function TabLayout() {
   return (
     <CartProvider>
       <Tabs
-        initialRouteName="index" // Establece "explore" como la pantalla inicial
+        initialRouteName="index" // Establece "index" como la pantalla inicial
         screenOptions={{
           tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-          headerShown: false, // Oculta el header (barra de navegación superior)
-          tabBarStyle: { display: 'none' }, // Oculta la barra de pestañas si lo deseas
         }}
       >
+        {/* Pantalla de Home (index), aquí la barra de navegación estará habilitada */}
         <Tabs.Screen
-          name="index"
+          name="home"
           options={{
             title: 'Home',
+            tabBarStyle: { display: 'flex' }, // Muestra la barra de navegación
             tabBarIcon: ({ color, focused }) => (
               <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color} />
             ),
           }}
         />
+
         <Tabs.Screen
-          name="register"
+          name="CartScreen"
           options={{
-            title: 'Register',
+            title: 'Carrito',
+            tabBarStyle: { display: 'flex' }, // Muestra la barra de navegación
             tabBarIcon: ({ color, focused }) => (
-              <TabBarIcon name={focused ? 'person-add' : 'person-add-outline'} color={color} />
+              <TabBarIcon name={focused ? 'cart' : 'cart-outline'} color={color} />
+
             ),
           }}
         />
+
         <Tabs.Screen
-          name="recuperar"
+          name="ConfirmacionPedidoScreen"
           options={{
-            title: 'Recuperar',
+            title: 'Pedidos',
+            tabBarStyle: { display: 'flex' }, // Muestra la barra de navegación
             tabBarIcon: ({ color, focused }) => (
-              <TabBarIcon name={focused ? 'person-add' : 'person-add-outline'} color={color} />
+              <TabBarIcon name={focused ? 'checkmark-circle' : 'checkmark-circle-outline'} color={color} />
+
             ),
           }}
         />
+
+        {/* Pantalla de Registro, aquí la barra de navegación estará deshabilitada */}
+        
+        {/* Pantalla de Recuperar Contraseña, aquí también estará deshabilitada */}
+        
       </Tabs>
     </CartProvider>
   );

@@ -1,98 +1,190 @@
 import React from 'react';
-import { View, Text, FlatList, StyleSheet, Button, Alert } from 'react-native';
-import { useCart } from '../(tabs)/CartContext';  // Ajustar según la ubicación
-import { useRouter } from 'expo-router'; // Importar useRouter para Expo Router
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { useCart } from '../(tabs)/CartContext';
+import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 
 const ConfirmacionPedidoScreen = () => {
-  const { items, clearCart } = useCart(); // Accede a los productos del carrito y la función para limpiar el carrito
-  const router = useRouter(); // Usar el hook useRouter para navegar
+  const { items, clearCart } = useCart();
+  const router = useRouter();
 
   const handleConfirmarPedido = () => {
-    // Aquí puedes realizar cualquier lógica para confirmar el pedido, por ejemplo, una llamada a la API
-    Alert.alert("Pedido Confirmado", "Tu pedido ha sido confirmado con éxito.");
-    
-    // Vaciar el carrito después de confirmar el pedido
     clearCart();
-
-    // Redirigir al usuario a la pantalla de inicio
-    router.push('/home'); // Aquí debes colocar la ruta correspondiente a la pantalla de inicio
+    router.push('/home');
   };
+
+  const renderItem = ({ item }) => (
+    <View style={styles.productItem}>
+      <Image style={styles.productImage} source={{ uri: item.image || 'https://via.placeholder.com/50' }} />
+      <View style={styles.productDetails}>
+        <Text style={styles.productName}>{item.name}</Text>
+        <Text style={styles.productStore}>Mall Chino Deluxe</Text> {/* Placeholder for store name */}
+      </View>
+      <Text style={styles.productPrice}>${item.price}</Text>
+      
+    </View>
+    
+  );
+
+  const total = items.reduce((total, item) => total + item.price, 0);
+  console.log(items.precio);
+  const comisionApp = total * 0.07; // 7% comisión
+  const totalConComision = total + comisionApp;
+  
+
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Confirmación de Pedido</Text>
-      {items.length === 0 ? (
-        <Text style={styles.emptyCartText}>No hay productos en el carrito</Text>
-      ) : (
-        <>
-          <FlatList
-            data={items}
-            renderItem={({ item }) => (
-              <View style={styles.itemContainer}>
-                <Text style={styles.itemName}>{item.name}</Text>
-                <Text style={styles.itemPrice}>${item.price}</Text>
-              </View>
-            )}
-            keyExtractor={(item, index) => index.toString()}
-          />
+      {/* Header */}
+      <View style={styles.header}>
+        <Ionicons name="arrow-back-outline" size={24} color="#fff" />
+        <Text style={styles.headerText}>Carro</Text>
+        <Ionicons name="menu-outline" size={28} color="#fff" />
+      </View>
 
-          <View style={styles.totalContainer}>
-            <Text style={styles.totalText}>
-              Total: $
-              {items.reduce((total, item) => total + item.price, 0).toFixed(2)}
-            </Text>
-          </View>
+      {/* Subheader */}
+      <View style={styles.subheader}>
+        <Text style={styles.subheaderText}>{items.length} Productos</Text>
+        <Text style={styles.subheaderText}>1 Tienda</Text>
+      </View>
 
-          <Button
-            title="Confirmar Pedido"
-            onPress={handleConfirmarPedido} // Llamada para confirmar el pedido
-          />
-        </>
-      )}
+      {/* Lista de productos */}
+      <FlatList
+        data={items}
+        renderItem={renderItem}
+        keyExtractor={(item, index) => index.toString()}
+        contentContainerStyle={styles.list}
+      />
+
+      {/* Total y comisión */}
+      <View style={styles.totalContainer}>
+        <View style={styles.totalRow}>
+          <Text style={styles.totalText}>Comisión App</Text>
+          <Text style={styles.totalText}>+ 7% (${comisionApp.toFixed(2)})</Text>
+        </View>
+        <View style={styles.totalRow}>
+          <Text style={styles.totalTextBold}>Total</Text>
+          <Text style={styles.totalTextBold}>${totalConComision.toFixed(2)}</Text>
+        </View>
+      </View>
+
+      {/* Botón de pago */}
+      <TouchableOpacity style={styles.payButton} onPress={handleConfirmarPedido}>
+        <Text style={styles.payButtonText}>Pagar</Text>
+      </TouchableOpacity>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
-    backgroundColor: '#fff',
     flex: 1,
+    backgroundColor: '#F2F2F2',
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  emptyCartText: {
-    fontSize: 16,
-    color: '#888',
-  },
-  itemContainer: {
+  header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    padding: 10,
-    backgroundColor: '#f9f9f9',
-    marginVertical: 5,
-    borderRadius: 5,
+    alignItems: 'center',
+    backgroundColor: '#00C1A5',
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
   },
-  itemName: {
+  headerText: {
     fontSize: 18,
+    fontWeight: 'bold',
+    color: '#fff',
   },
-  itemPrice: {
+  subheader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E0E0E0',
+  },
+  subheaderText: {
+    fontSize: 14,
+    color: '#333',
+  },
+  productItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    padding: 15,
+    marginVertical: 5,
+    marginHorizontal: 20,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 5,
+    elevation: 2,
+  },
+  productImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 10,
+  },
+  productDetails: {
+    flex: 1,
+    paddingHorizontal: 10,
+  },
+  productName: {
     fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  productStore: {
+    fontSize: 14,
+    color: '#888',
+  },
+  productPrice: {
+    fontSize: 16,
+    fontWeight: 'bold',
     color: '#333',
   },
   totalContainer: {
-    marginTop: 20,
-    paddingVertical: 10,
-    borderTopWidth: 1,
-    borderTopColor: '#ccc',
+    backgroundColor: '#fff',
+    padding: 20,
+    marginVertical: 10,
+    marginHorizontal: 20,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 5,
+    elevation: 2,
+  },
+  totalRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginVertical: 5,
   },
   totalText: {
+    fontSize: 16,
+    color: '#666',
+  },
+  totalTextBold: {
     fontSize: 18,
     fontWeight: 'bold',
-    textAlign: 'right',
+    color: '#333',
+  },
+  payButton: {
+    backgroundColor: '#00C1A5',
+    paddingVertical: 15,
+    borderRadius: 10,
+    marginHorizontal: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  payButtonText: {
+    fontSize: 18,
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });
 

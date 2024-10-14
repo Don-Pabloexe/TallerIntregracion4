@@ -15,6 +15,7 @@ interface Product {
 const { width: screenWidth } = Dimensions.get('window');
 
 // Componente para el carrusel horizontal
+// Componente para el carrusel horizontal
 const HorizontalProductCarousel: React.FC<{ products: Product[] }> = ({ products }) => {
   const scrollViewRef = useRef<ScrollView>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -57,12 +58,15 @@ const HorizontalProductCarousel: React.FC<{ products: Product[] }> = ({ products
               <Image source={{ uri: item.imagen }} style={styles.image} />
             )}
             <Text style={styles.title}>{item.nombre}</Text>
+            {/* Aquí mostramos el precio correspondiente */}
+            <Text style={styles.price}>${parseFloat(item.precio).toFixed(2)}</Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
     </View>
   );
 };
+
 
 // Componente para la lista vertical
 const VerticalProductList: React.FC<{ products: Product[] }> = ({ products }) => {
@@ -72,10 +76,11 @@ const VerticalProductList: React.FC<{ products: Product[] }> = ({ products }) =>
     <View style={styles.verticalCard}>
       <Image source={{ uri: item.imagen }} style={styles.image} />
       <Text style={styles.title}>{item.nombre}</Text>
-      <Text style={styles.price}>${item.precio}</Text>
+      {/* Formateamos el precio correctamente */}
+      <Text style={styles.price}>${parseFloat(item.precio).toFixed(2)}</Text>
       <TouchableOpacity
         onPress={() => {
-          addItem({ image: item.imagen, name: item.nombre, price: item.precio });
+          addItem({ image: item.imagen, name: item.nombre, price: parseFloat(item.precio) }); // Asegúrate de que el precio sea un número
         }}
         style={styles.cartButton}
       >

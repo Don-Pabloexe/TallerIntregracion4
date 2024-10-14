@@ -99,7 +99,7 @@ app.post('/reset-password', async (req, res) => {
   }
 });
 
-
+//Funcionalidades Ryson
 app.get('/products', async (req, res) => {
   try {
     const result = await pool.query('SELECT id, nombre, precio, imagen FROM products');
@@ -109,7 +109,7 @@ app.get('/products', async (req, res) => {
     res.status(500).json({ error: 'Error fetching products' });
   }
 });
-//Funcionalidades Ryson
+
 app.get('/marcas', async (req, res) => {
   try {
     const result = await pool.query('SELECT id, nombre, imagen FROM marcas');
