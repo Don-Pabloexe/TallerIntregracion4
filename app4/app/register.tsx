@@ -7,9 +7,10 @@ import { useRouter } from "expo-router"; // Para manejar la navegación
 const RegisterScreen = () => {
   const router = useRouter(); // Hook para navegación
   const [email, setEmail] = useState("");
-  const [fullname, setFullname] = useState("");
-  const [username, setUsername] = useState("");
-  const [rut, setRut] = useState(""); // Nuevo campo de RUT
+  const [nombre, setNombre] = useState(""); // Modificado: campo Nombre
+  const [apellido, setApellido] = useState(""); // Modificado: campo Apellido
+  const [rut, setRut] = useState(""); // Modificado: Nuevo campo de RUT
+  const [telefono, setTelefono] = useState(""); // Modificado: Nuevo campo de Teléfono
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -26,9 +27,10 @@ const RegisterScreen = () => {
       // Hacer la solicitud POST al servidor para registrar el usuario
       const response = await axios.post('http://localhost:5000/register', {
         email,
-        fullname,
-        username,
-        rut,
+        nombre,  // Actualizado
+        apellido, // Actualizado
+        rut,  // Actualizado
+        telefono,  // Actualizado
         password
       });
 
@@ -58,9 +60,16 @@ const RegisterScreen = () => {
       />
 
       <TextInput
-        value={fullname}
-        onChangeText={setFullname}
-        placeholder="Nombre Completo"
+        value={nombre} // Actualizado: nombre
+        onChangeText={setNombre} // Actualizado
+        placeholder="Nombre"
+        style={styles.input}
+      />
+
+      <TextInput
+        value={apellido} // Actualizado: apellido
+        onChangeText={setApellido} // Actualizado
+        placeholder="Apellido"
         style={styles.input}
       />
 
@@ -72,10 +81,12 @@ const RegisterScreen = () => {
         style={styles.input}
       />
 
+      {/* Campo de Teléfono */}
       <TextInput
-        value={username}
-        onChangeText={setUsername}
-        placeholder="Nombre de Usuario"
+        value={telefono}
+        onChangeText={setTelefono}
+        placeholder="Teléfono"
+        keyboardType="phone-pad"
         style={styles.input}
       />
 

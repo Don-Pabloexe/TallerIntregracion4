@@ -23,14 +23,14 @@ export default function IndexScreen() {
     try {
       // Petición al backend para iniciar sesión
       const response = await axios.post('http://localhost:5000/login', {
-        email,
-        password
+        email, // Correo ingresado
+        password // Contraseña ingresada
       });
 
       const { user } = response.data;
 
       // Mostrar una alerta que indica que la sesión se inició correctamente
-      Alert.alert('Inicio de sesión exitoso', `Bienvenido, ${user.username}`);
+      Alert.alert('Inicio de sesión exitoso', `Bienvenido, ${user.nombre}`); // Actualizado para usar "nombre" en lugar de "username"
 
       // Después de un pequeño retraso, redirigir al Home
       setTimeout(() => {

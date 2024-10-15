@@ -3,41 +3,63 @@ import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image } from 'react
 import { useCart } from '../(tabs)/CartContext';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import axios from 'axios';  // Si necesitas hacer peticiones al backend
 
 const ConfirmacionPedidoScreen = () => {
-  const { items, clearCart } = useCart();
+  const { items, clearCart } = useCart();  // Obtener los productos en el carrito y la función para limpiarlo
   const router = useRouter();
 
-  const handleConfirmarPedido = () => {
-    clearCart();
-    router.push('/home');
+  // Función para confirmar el pedido
+  const handleConfirmarPedido = async () => {
+    try {
+      // Prepara los datos del pedido
+      const pedido = {
+        total: totalConComision,  // El total del pedido
+        idUsuario: 1,  // Ejemplo, deberías obtenerlo del estado global o sesión
+        tienda: items[0]?.ID_Tienda,  // Suponiendo que todos los productos provienen de una misma tienda
+        direccion: 'Calle Falsa 123'  // Deberías obtener la dirección del usuario
+      };
+  
+      // Enviar la solicitud POST al servidor para registrar el pedido
+      await axios.post('http://localhost:5000/confirmarPedido', pedido);
+  
+      // Limpiar el carrito después de confirmar el pedido
+      clearCart();
+  
+      // Redirigir al usuario al Home
+      router.push('/home');
+    } catch (error) {
+      console.error('Error al confirmar el pedido:', error);
+    }
   };
-
+  
+  
+  // Renderizado de cada producto en el carrito
   const renderItem = ({ item }) => (
     <View style={styles.productItem}>
-      <Image style={styles.productImage} source={{ uri: item.image || 'https://via.placeholder.com/50' }} />
+      <Image style={styles.productImage} source={{ uri: item.Imagen || 'https://via.placeholder.com/50' }} />
       <View style={styles.productDetails}>
-        <Text style={styles.productName}>{item.name}</Text>
-        <Text style={styles.productStore}>Mall Chino Deluxe</Text> {/* Placeholder for store name */}
+        <Text style={styles.productName}>{item.Nombre_Producto}</Text>
+        <Text style={styles.productStore}>Tienda #{item.ID_Tienda}</Text> {/* Mostrar el ID o nombre de la tienda */}
       </View>
-      <Text style={styles.productPrice}>${item.price}</Text>
-      
+      <Text style={styles.productPrice}>
+        {item.Precio !== undefined && item.Precio !== null && !isNaN(Number(item.Precio)) 
+          ? `$${Number(item.Precio).toFixed(2)}`
+          : 'Precio no disponible'}
+      </Text>
     </View>
-    
   );
 
-  const total = items.reduce((total, item) => total + item.price, 0);
-  console.log(items.precio);
+  // Calcular el total del pedido
+  const total = items.reduce((total, item) => total + item.Precio, 0); // Calcula el total basado en `Precio`
   const comisionApp = total * 0.07; // 7% comisión
-  const totalConComision = total + comisionApp;
-  
-
+  const totalConComision = total + comisionApp; // Total con comisión
 
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Ionicons name="arrow-back-outline" size={24} color="#fff" />
+        <Ionicons name="arrow-back-outline" size={24} color="#fff" onPress={() => router.back()} />
         <Text style={styles.headerText}>Carro</Text>
         <Ionicons name="menu-outline" size={28} color="#fff" />
       </View>
@@ -45,7 +67,7 @@ const ConfirmacionPedidoScreen = () => {
       {/* Subheader */}
       <View style={styles.subheader}>
         <Text style={styles.subheaderText}>{items.length} Productos</Text>
-        <Text style={styles.subheaderText}>1 Tienda</Text>
+        <Text style={styles.subheaderText}>1 Tienda</Text> {/* Ajusta si manejas múltiples tiendas */}
       </View>
 
       {/* Lista de productos */}
