@@ -155,12 +155,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 20,
   },
+
   title: {
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 30,
     color: "#00BFA6",
   },
+
   input: {
     backgroundColor: "#FFFFFF",
     width: "100%",
@@ -170,6 +172,7 @@ const styles = StyleSheet.create({
     borderColor: "#00BFA6",
     borderWidth: 1,
   },
+
   passwordContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -181,12 +184,15 @@ const styles = StyleSheet.create({
     borderColor: "#00BFA6",
     borderWidth: 1,
   },
+
   inputPassword: {
     flex: 1,
   },
+
   icon: {
     marginLeft: 10,
   },
+
   registerButton: {
     backgroundColor: "#00BFA6",
     width: "100%",
@@ -195,11 +201,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 20,
   },
+
   registerButtonText: {
     color: "#FFFFFF",
     fontSize: 18,
     fontWeight: "bold",
   },
+
   backButton: {
     backgroundColor: "#A6A6A6",
     width: "100%",
@@ -208,15 +216,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 10,
   },
+
   backButtonText: {
     color: "#FFFFFF",
     fontSize: 18,
     fontWeight: "bold",
   },
+
   message: {
     marginTop: 20,
     color: "red",
   },
+  
 });
 
 export default RegisterScreen;

@@ -1,3 +1,4 @@
+
 const express = require('express');
 const { Pool } = require('pg');
 const bcrypt = require('bcrypt'); // Para encriptar contraseñas
@@ -122,12 +123,12 @@ app.get('/marcas', async (req, res) => {
   try {
     const result = await pool.query('SELECT id_tienda AS id, nombre FROM tienda');
     res.json(result.rows);
+  
   } catch (error) {
     console.error('Error fetching marcas:', error);
     res.status(500).json({ error: 'Error fetching marcas' });
   }
 });
-
 
 // Ruta para obtener productos de una marca específica
 app.get('/marcas/:brandId/products', async (req, res) => {
@@ -161,6 +162,27 @@ app.post('/procesarPago', async (req, res) => {
   } catch (error) {
     console.error('Error al procesar el pago:', error);
     res.status(500).json({ error: 'Error al procesar el pago' });
+  }
+});
+
+// Ruta para obtener todos los pedidos
+app.get('/historialPedido', async (req, res) => {
+  const { id_usuario } = req.query; // Obtiene el id_usuario de la consulta
+
+  if (!id_usuario) {
+    return res.status(400).json({ error: 'El id_usuario es obligatorio' });
+  }
+
+  try {
+    const result = await pool.query(
+      'SELECT fecha_pedido, precio_total, direccion, sector, comentarios FROM pedido WHERE id_usuario = $1',
+      [id_usuario]
+    );
+    res.json(result.rows);
+  
+  } catch (error) {
+    console.error('Error al obtener pedidos:', error);
+    res.status(500).json({ error: 'Error al obtener pedidos' });
   }
 });
 

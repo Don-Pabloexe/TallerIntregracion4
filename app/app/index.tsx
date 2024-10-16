@@ -1,52 +1,53 @@
+
 import React, { useState } from 'react';
 import { View, TextInput, StyleSheet, Image, TouchableOpacity, Alert, Modal, ActivityIndicator } from 'react-native';
 import { CheckBox } from 'react-native-elements';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import Animated, { SlideInLeft, SlideOutRight } from 'react-native-reanimated'; // Animaciones
-import axios from 'axios'; // Usaremos axios para hacer peticiones HTTP
+import Animated, { SlideInLeft, SlideOutRight } from 'react-native-reanimated';
+import axios from 'axios'; 
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Importar AsyncStorage
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 
 export default function IndexScreen() {
-  const router = useRouter(); // Hook para navegación
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
-  const [isLoggingIn, setIsLoggingIn] = useState(false); // Estado para mostrar el modal de carga
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   const handleLogin = async () => {
     setIsLoggingIn(true);
 
     try {
-      // Petición al backend para iniciar sesión
       const response = await axios.post('http://localhost:5000/login', {
-        email, // Correo ingresado
-        password // Contraseña ingresada
+        email,
+        password
       });
 
       const { user } = response.data;
 
-      // Mostrar una alerta que indica que la sesión se inició correctamente
-      Alert.alert('Inicio de sesión exitoso', `Bienvenido, ${user.nombre}`); // Actualizado para usar "nombre" en lugar de "username"
+      // Guardar el ID del usuario en AsyncStorage
+      await AsyncStorage.setItem('userId', user.id_usuario.toString());
+      console.log('ID de usuario guardado:', user.id_usuario); // Verificación del guardado
 
-      // Después de un pequeño retraso, redirigir al Home
+      Alert.alert('Inicio de sesión exitoso', `Bienvenido, ${user.nombre}`);
+
       setTimeout(() => {
-        setIsLoggingIn(false); // Ocultar el modal de carga
-        router.push('/home'); // Redirige al Home
-      }, 1000); // Esperar 1 segundo para completar la transición
+        setIsLoggingIn(false);
+        router.push('/home');
+      }, 1000);
+    
     } catch (error) {
-      // Manejar errores de inicio de sesión
-      setIsLoggingIn(false); // Ocultar el modal de carga en caso de error
+      setIsLoggingIn(false);
 
       if (error.response) {
-        // Error desde el servidor
         console.log('Error de inicio de sesión:', error.response.data);
         Alert.alert('Error', error.response.data);
       } else {
-        // Error inesperado
         console.log('Error inesperado durante el inicio de sesión.');
         Alert.alert('Error', 'Ocurrió un error inesperado.');
       }
@@ -58,22 +59,21 @@ export default function IndexScreen() {
       headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
       headerImage={
         <Image
-          source={require('@/assets/images/partial-react-logo.png')} // Placeholder para el logo
+          source={require('@/assets/images/partial-react-logo.png')}
           style={styles.logo}
         />
       }
     >
       <ThemedView style={styles.centeredContainer}>
         <Animated.View
-          entering={SlideInLeft.duration(500)} // Animación de entrada
-          exiting={SlideOutRight.duration(500)} // Animación de salida
+          entering={SlideInLeft.duration(500)}
+          exiting={SlideOutRight.duration(500)}
           style={styles.formBox}
         >
           <ThemedText type="title" style={styles.titleText}>
             Inicio de Sesión
           </ThemedText>
 
-          {/* Campo de Correo */}
           <View style={styles.inputContainer}>
             <Ionicons name="person-outline" size={24} color="#A6A6A6" />
             <TextInput
@@ -86,7 +86,6 @@ export default function IndexScreen() {
             />
           </View>
 
-          {/* Campo de Contraseña */}
           <View style={styles.inputContainer}>
             <Ionicons name="lock-closed-outline" size={24} color="#A6A6A6" />
             <TextInput
@@ -98,7 +97,6 @@ export default function IndexScreen() {
             />
           </View>
 
-          {/* Checkbox para "Recordar mi contraseña" */}
           <View style={styles.rememberMeContainer}>
             <CheckBox
               title="Recordar mi contraseña"
@@ -111,18 +109,15 @@ export default function IndexScreen() {
             />
           </View>
 
-          {/* Botón de Acceder */}
           <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
             <ThemedText style={styles.loginButtonText}>Acceder</ThemedText>
           </TouchableOpacity>
 
-          {/* Enlace para "¿Olvidaste tu contraseña?" */}
           <TouchableOpacity onPress={() => router.push('/recuperar')}>
             <ThemedText style={styles.forgotPasswordText}>¿Olvidaste tu contraseña?</ThemedText>
           </TouchableOpacity>
         </Animated.View>
 
-        {/* Enlace para "Crea una cuenta" */}
         <View style={styles.signupContainer}>
           <ThemedText type="default">¿No tienes una cuenta? </ThemedText>
           <TouchableOpacity onPress={() => router.push('/register')}>
@@ -130,7 +125,6 @@ export default function IndexScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Modal de carga que se muestra cuando está iniciando sesión */}
         <Modal transparent={true} visible={isLoggingIn} animationType="fade">
           <View style={styles.modalBackground}>
             <View style={styles.modalContainer}>
@@ -228,7 +222,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fondo transparente y oscuro
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContainer: {
     backgroundColor: '#fff',

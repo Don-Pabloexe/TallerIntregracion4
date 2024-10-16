@@ -1,11 +1,12 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image, TextInput } from 'react-native';
 import { useCart } from '../(tabs)/CartContext';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';  
 import Modal from 'react-native-modal';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Importa AsyncStorage
 
 const ConfirmacionPedidoScreen = () => {
   const { items, clearCart } = useCart();  
@@ -17,6 +18,24 @@ const ConfirmacionPedidoScreen = () => {
   const [sector, setSector] = useState('');
   const [comentario, setComentario] = useState('');
   const [error, setError] = useState(''); // Estado para mostrar errores
+  const [userId, setUserId] = useState(null); // Estado para almacenar el ID del usuario
+
+  useEffect(() => {
+    const fetchUserId = async () => {
+      try {
+        const id = await AsyncStorage.getItem('userId'); // Recupera el ID del usuario
+        if (id) {
+          setUserId(id); // Almacena el ID en el estado
+        } else {
+          console.log('No se encontró el ID de usuario.');
+        }
+      } catch (error) {
+        console.error('Error al obtener el ID de usuario:', error);
+      }
+    };
+
+    fetchUserId();
+  }, []);
 
   const handleConfirmarPedido = async () => {
     // Validación simple
@@ -28,7 +47,7 @@ const ConfirmacionPedidoScreen = () => {
     try {
       const pedido = {
         total: totalConComision,
-        idUsuario: 1,  // Deberías obtener el ID del usuario real
+        idUsuario: userId, // Utiliza el ID del usuario recuperado
         tienda: items[0]?.ID_Tienda,
         direccion: direccion,
         sector: sector,
@@ -74,7 +93,6 @@ const ConfirmacionPedidoScreen = () => {
 
       <View style={styles.subheader}>
         <Text style={styles.subheaderText}>{items.length} Productos</Text>
-        <Text style={styles.subheaderText}>1 Tienda</Text>
       </View>
 
       <FlatList
@@ -137,10 +155,12 @@ const ConfirmacionPedidoScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  
   container: {
     flex: 1,
     backgroundColor: '#F2F2F2',
   },
+
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -151,11 +171,13 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
   },
+
   headerText: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#fff',
   },
+
   subheader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -165,10 +187,12 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#E0E0E0',
   },
+
   subheaderText: {
     fontSize: 14,
     color: '#333',
   },
+
   productItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -184,29 +208,35 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 2,
   },
+
   productImage: {
     width: 50,
     height: 50,
     borderRadius: 10,
   },
+
   productDetails: {
     flex: 1,
     paddingHorizontal: 10,
   },
+
   productName: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#333',
   },
+
   productStore: {
     fontSize: 14,
     color: '#888',
   },
+
   productPrice: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#333',
   },
+
   totalContainer: {
     backgroundColor: '#fff',
     padding: 20,
@@ -219,20 +249,24 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 2,
   },
+
   totalRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginVertical: 5,
   },
+
   totalText: {
     fontSize: 16,
     color: '#666',
   },
+
   totalTextBold: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#333',
   },
+
   payButton: {
     backgroundColor: '#00C1A5',
     paddingVertical: 15,
@@ -253,6 +287,7 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 10,
   },
+
   modalTitle: {
     fontSize: 18,
     fontWeight: 'bold',

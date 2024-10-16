@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useRef } from 'react';
 import { View, ScrollView, FlatList, Text, Image, StyleSheet, TouchableOpacity, Dimensions, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -102,8 +103,6 @@ const VerticalProductList: React.FC<{ products: Product[] }> = ({ products }) =>
       </TouchableOpacity>
     </View>
   );
-  
-  
 
   return (
     <View style={styles.section}>
@@ -155,10 +154,12 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
+  
   container: {
     backgroundColor: '#0D5B6C',
     padding: 15,
   },
+
   section: {
     marginVertical: 5,
     backgroundColor: '#D1F9FF',
@@ -170,9 +171,11 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
+
   scrollViewContainer: {
     paddingHorizontal: 0,
   },
+
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
@@ -184,6 +187,7 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 3,
   },
+
   card: {
     width: screenWidth - 30,
     backgroundColor: '#fff',
@@ -196,6 +200,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 4,
   },
+
   verticalCard: {
     flex: 1,
     backgroundColor: '#fff',
@@ -210,12 +215,14 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 4,
   },
+
   title: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#444',
     marginBottom: 5,
   },
+
   image: {
     marginTop: 20,
     width: 60,
@@ -223,10 +230,12 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
     marginBottom: 10,
   },
+
   price: {
     fontSize: 16,
     color: '#888',
   },
+
   cartButton: {
     backgroundColor: '#0085A5',
     padding: 10,
@@ -234,7 +243,9 @@ const styles = StyleSheet.create({
     marginTop: 10,
     alignItems: 'center',
   },
+
   flatListContainer: {
     paddingVertical: 5,
   },
+
 });
