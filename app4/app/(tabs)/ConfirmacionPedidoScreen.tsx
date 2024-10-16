@@ -4,6 +4,7 @@ import { useCart } from '../(tabs)/CartContext';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';  // Si necesitas hacer peticiones al backend
+import ErrorBoundary from './ErrorBoundary';
 
 const ConfirmacionPedidoScreen = () => {
   const { items, clearCart } = useCart();  // Obtener los productos en el carrito y la función para limpiarlo
@@ -56,45 +57,48 @@ const ConfirmacionPedidoScreen = () => {
   const totalConComision = total + comisionApp; // Total con comisión
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Ionicons name="arrow-back-outline" size={24} color="#fff" onPress={() => router.back()} />
-        <Text style={styles.headerText}>Carro</Text>
-        <Ionicons name="menu-outline" size={28} color="#fff" />
-      </View>
-
-      {/* Subheader */}
-      <View style={styles.subheader}>
-        <Text style={styles.subheaderText}>{items.length} Productos</Text>
-        <Text style={styles.subheaderText}>1 Tienda</Text> {/* Ajusta si manejas múltiples tiendas */}
-      </View>
-
-      {/* Lista de productos */}
-      <FlatList
-        data={items}
-        renderItem={renderItem}
-        keyExtractor={(item, index) => index.toString()}
-        contentContainerStyle={styles.list}
-      />
-
-      {/* Total y comisión */}
-      <View style={styles.totalContainer}>
-        <View style={styles.totalRow}>
-          <Text style={styles.totalText}>Comisión App</Text>
-          <Text style={styles.totalText}>+ 7% (${comisionApp.toFixed(2)})</Text>
+    <ErrorBoundary>  {/* Aquí envolvemos con ErrorBoundary */}
+      <View style={styles.container}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Ionicons name="arrow-back-outline" size={24} color="#fff" onPress={() => router.back()} />
+          <Text style={styles.headerText}>Carro</Text>
+          <Ionicons name="menu-outline" size={28} color="#fff" />
         </View>
-        <View style={styles.totalRow}>
-          <Text style={styles.totalTextBold}>Total</Text>
-          <Text style={styles.totalTextBold}>${totalConComision.toFixed(2)}</Text>
-        </View>
-      </View>
 
-      {/* Botón de pago */}
-      <TouchableOpacity style={styles.payButton} onPress={handleConfirmarPedido}>
-        <Text style={styles.payButtonText}>Pagar</Text>
-      </TouchableOpacity>
-    </View>
+        {/* Subheader */}
+        <View style={styles.subheader}>
+          <Text style={styles.subheaderText}>{items.length} Productos</Text>
+          <Text style={styles.subheaderText}>1 Tienda</Text> {/* Ajusta si manejas múltiples tiendas */}
+        </View>
+
+        {/* Lista de productos */}
+        <FlatList
+          data={items}
+          renderItem={renderItem}
+          keyExtractor={(item, index) => index.toString()}
+          contentContainerStyle={styles.list}
+        />
+
+        {/* Total y comisión */}
+        <View style={styles.totalContainer}>
+          <View style={styles.totalRow}>
+            <Text style={styles.totalText}>Comisión App</Text>
+            <Text style={styles.totalText}>+ 7% (${comisionApp.toFixed(2)})</Text>
+          </View>
+          <View style={styles.totalRow}>
+            <Text style={styles.totalTextBold}>Total</Text>
+            <Text style={styles.totalTextBold}>${totalConComision.toFixed(2)}</Text>
+          </View>
+        </View>
+
+        {/* Botón de pago */}
+        <TouchableOpacity style={styles.payButton} onPress={handleConfirmarPedido}>
+          <Text style={styles.payButtonText}>Pagar</Text>
+        </TouchableOpacity>
+        
+      </View>
+    </ErrorBoundary>
   );
 };
 

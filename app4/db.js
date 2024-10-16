@@ -167,7 +167,7 @@ app.post('/procesarPago', async (req, res) => {
 // Confirmar pedido y registrar en la base de datos
 // Confirmar pedido y registrar en la base de datos
 app.post('/confirmarPedido', async (req, res) => {
-  const { total, idUsuario, tienda, direccion } = req.body;
+  const { total, idUsuario, tienda, direccion } = req.body;  // Solo recibimos el total y otros datos necesarios
 
   try {
     // Validar que todos los datos requeridos están presentes
@@ -175,11 +175,11 @@ app.post('/confirmarPedido', async (req, res) => {
       return res.status(400).json({ error: 'Faltan datos en la solicitud.' });
     }
 
-    // Insertar el pedido en la tabla 'pedido'
+    // Insertar el pedido en la tabla 'pedido' con el total y demás datos
     const result = await pool.query(
       `INSERT INTO pedido (fecha_pedido, precio_total, iva, direccion, id_usuario, id_tienda)
        VALUES (NOW(), $1, $2, $3, $4, $5) RETURNING id_pedido`,
-      [total, total * 0.19, direccion, idUsuario, tienda]
+      [total, total * 0.19, direccion, idUsuario, tienda] // IVA del 19%
     );
 
     const pedidoId = result.rows[0].id_pedido;
@@ -191,6 +191,7 @@ app.post('/confirmarPedido', async (req, res) => {
     res.status(500).json({ error: 'Error al confirmar el pedido' });
   }
 });
+
 
 
 

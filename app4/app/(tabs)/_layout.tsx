@@ -29,17 +29,6 @@ export default function TabLayout() {
           }}
         />
 
-        <Tabs.Screen
-          name="CartScreen"
-          options={{
-            title: 'Carrito',
-            tabBarStyle: { display: 'flex' }, // Muestra la barra de navegación
-            tabBarIcon: ({ color, focused }) => (
-              <TabBarIcon name={focused ? 'cart' : 'cart-outline'} color={color} />
-
-            ),
-          }}
-        />
 
         <Tabs.Screen
           name="ConfirmacionPedidoScreen"

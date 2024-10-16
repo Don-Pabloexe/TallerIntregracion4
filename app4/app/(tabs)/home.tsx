@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useCart } from '../(tabs)/CartContext';
 import { useRouter } from 'expo-router';
 import axios from "axios"; 
+import ErrorBoundary from './ErrorBoundary';
 
 interface Product {
   id: number;  // El id del producto
@@ -22,6 +23,7 @@ interface Marca {
 const { width: screenWidth } = Dimensions.get('window');
 
 // Componente para el carrusel horizontal (Marcas)
+
 const HorizontalBrandCarousel: React.FC<{ marcas: Marca[] }> = ({ marcas }) => {
   const scrollViewRef = useRef<ScrollView>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -76,12 +78,8 @@ const VerticalProductList: React.FC<{ products: Product[] }> = ({ products }) =>
     <View style={styles.verticalCard}>
       <Image source={{ uri: item.imagen }} style={styles.image} />
       <Text style={styles.title}>{item.nombre}</Text>
-      <Text style={styles.price}>
-        {/* Asegúrate de que `precio` sea convertido a número antes de usar `toFixed` */}
-        {item.precio !== undefined && item.precio !== null && !isNaN(Number(item.precio))
-          ? `$${Number(item.precio).toFixed(2)}`
-          : 'Precio no disponible'}
-      </Text>
+      {/* Asegúrate de que todos los valores numéricos estén dentro de <Text> */}
+      <Text style={styles.price}> {item.precio}</Text>
       <TouchableOpacity
         onPress={() => {
           addItem({
@@ -90,7 +88,6 @@ const VerticalProductList: React.FC<{ products: Product[] }> = ({ products }) =>
             Precio: Number(item.precio),  // Asegúrate de convertir el precio
             Imagen: item.imagen,
             ID_Tienda: item.id_tienda,
-
           });
         }}
         style={styles.cartButton}
@@ -102,8 +99,6 @@ const VerticalProductList: React.FC<{ products: Product[] }> = ({ products }) =>
       </TouchableOpacity>
     </View>
   );
-  
-  
 
   return (
     <View style={styles.section}>
@@ -118,6 +113,7 @@ const VerticalProductList: React.FC<{ products: Product[] }> = ({ products }) =>
     </View>
   );
 };
+
 
 // Componente principal
 export default function HomeScreen() {
@@ -148,8 +144,12 @@ export default function HomeScreen() {
 
   return (
     <ScrollView style={styles.container}>
-      <HorizontalBrandCarousel marcas={marcas} />  {/* Muestra las tiendas */}
-      <VerticalProductList products={products} />  {/* Muestra los productos */}
+      <ErrorBoundary>
+        <HorizontalBrandCarousel marcas={marcas} />  {/* Muestra las tiendas */}
+      </ErrorBoundary>
+      <ErrorBoundary>
+        <VerticalProductList products={products} />  {/* Muestra los productos */}
+      </ErrorBoundary>
     </ScrollView>
   );
 }
