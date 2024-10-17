@@ -7,9 +7,9 @@ import { useRouter } from 'expo-router';
 import axios from "axios"; 
 
 interface Product {
-  id: number;  // El id del producto
-  nombre: string;  // El nombre del producto
-  precio: number;  // El precio del producto
+  id: number; 
+  nombre: string; 
+  precio: number; 
   imagen: string;
   id_tienda: number;
 }
@@ -41,27 +41,32 @@ const HorizontalBrandCarousel: React.FC<{ marcas: Marca[] }> = ({ marcas }) => {
   }, [currentIndex, marcas.length]);
 
   return (
-    <View style={styles.section}>
-      <Text style={styles.sectionTitle}>Tiendas</Text>
+    <View style = {styles.section}>
+
+      <Text style = {styles.sectionTitle}>Tiendas</Text>
       <ScrollView
-        ref={scrollViewRef}
+        ref ={scrollViewRef}
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.scrollViewContainer}
       >
         {marcas.map((item) => (
+          
           <TouchableOpacity
-            key={item.id}
-            style={styles.card}
-            onPress={() => {
-              router.push(`./BrandProducts/${item.id}`);
+            key = {item.id}
+            style = {styles.card}
+            onPress = {() => {
+              router.push({
+                pathname: `/StoreDetails/tienda/${item.id}`, 
+                params: { id_tienda: item.id }
+              });
             }}
           >
             {item.imagen && (
-              <Image source={{ uri: item.imagen }} style={styles.image} />
+              <Image source = {{ uri: item.imagen1 }} style = {styles.image} />
             )}
-            <Text style={styles.title}>{item.nombre}</Text>
+            <Text style = {styles.title}>{item.nombre}</Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
@@ -72,48 +77,62 @@ const HorizontalBrandCarousel: React.FC<{ marcas: Marca[] }> = ({ marcas }) => {
 // Componente para la lista vertical de productos
 const VerticalProductList: React.FC<{ products: Product[] }> = ({ products }) => {
   const { addItem } = useCart();
+  const router = useRouter(); // Asegúrate de agregar esta línea para definir el router
 
   const renderItem = ({ item }: { item: Product }) => (
-    <View style={styles.verticalCard}>
-      <Image source={{ uri: item.imagen }} style={styles.image} />
-      <Text style={styles.title}>{item.nombre}</Text>
-      <Text style={styles.price}>
-        {/* Asegúrate de que `precio` sea convertido a número antes de usar `toFixed` */}
-        {item.precio !== undefined && item.precio !== null && !isNaN(Number(item.precio))
-          ? `$${Number(item.precio).toFixed(2)}`
-          : 'Precio no disponible'}
-      </Text>
-      <TouchableOpacity
-        onPress={() => {
-          addItem({
-            ID_Producto: item.id,
-            Nombre_Producto: item.nombre,
-            Precio: Number(item.precio),  // Asegúrate de convertir el precio
-            Imagen: item.imagen,
-            ID_Tienda: item.id_tienda,
+    <View style = {styles.verticalCard}>
 
+      <TouchableOpacity
+        key={item.id}
+        style={{ alignContent: 'center', alignItems: 'center' }}
+        onPress={() => {
+          router.push({
+            pathname: `/StoreDetails/producto/${item.id}`, 
+            params: { id_producto: item.id }
           });
         }}
-        style={styles.cartButton}
       >
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Ionicons name="add-circle-outline" size={20} color="#fff" />
-          <Text style={{ color: '#fff', marginLeft: 5 }}>Agregar</Text>
-        </View>
+
+        <Image source={{ uri: item.imagen }} style={styles.image} />
+        <Text style={styles.title}>{item.nombre}</Text>
+        <Text style={styles.price}>
+          {item.precio !== undefined && item.precio !== null && !isNaN(Number(item.precio))
+            ? `$${Number(item.precio).toFixed(2)}`
+            : 'Precio no disponible'}
+        </Text>
+
+        <TouchableOpacity
+          onPress={() => {
+            addItem({
+              ID_Producto: item.id,
+              Nombre_Producto: item.nombre,
+              Precio: Number(item.precio),  // Asegúrate de convertir el precio
+              Imagen: item.imagen,
+              ID_Tienda: item.id_tienda,
+            });
+          }}
+          style={styles.cartButton}
+        >
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Ionicons name="add-circle-outline" size={20} color="#fff" />
+            <Text style={{ color: '#fff', marginLeft: 5 }}>Agregar</Text>
+          </View>
+        </TouchableOpacity>
+
       </TouchableOpacity>
     </View>
   );
 
   return (
-    <View style={styles.section}>
-      <Text style={styles.sectionTitle}>Más Productos</Text>
-      <FlatList
-        data={products}
-        renderItem={renderItem}
-        keyExtractor={(item, index) => index.toString()}
-        numColumns={2}
-        contentContainerStyle={styles.flatListContainer}
-      />
+    <View style = {styles.section}>
+        <Text style = {styles.sectionTitle}>Más Productos</Text>
+        <FlatList
+          data = {products}
+          renderItem = {renderItem}
+          keyExtractor = {(item, index) => index.toString()}
+          numColumns = {2}
+          contentContainerStyle = {styles.flatListContainer}
+        />
     </View>
   );
 };
@@ -146,9 +165,9 @@ export default function HomeScreen() {
   }, []);
 
   return (
-    <ScrollView style={styles.container}>
-      <HorizontalBrandCarousel marcas={marcas} />  {/* Muestra las tiendas */}
-      <VerticalProductList products={products} />  {/* Muestra los productos */}
+    <ScrollView style=  {styles.container}>
+      <HorizontalBrandCarousel marcas = {marcas} />  {/* Muestra las tiendas */}
+      <VerticalProductList products = {products} />  {/* Muestra los productos */}
     </ScrollView>
   );
 }
@@ -156,7 +175,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   
   container: {
-    backgroundColor: '#0D5B6C',
+    backgroundColor: '#00C1A5',
     padding: 15,
   },
 

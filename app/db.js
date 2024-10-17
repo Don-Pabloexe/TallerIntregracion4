@@ -133,9 +133,12 @@ app.get('/marcas', async (req, res) => {
 // Ruta para obtener productos de una marca específica
 app.get('/marcas/:brandId/products', async (req, res) => {
   const { brandId } = req.params;
-  
+
   try {
-    const result = await pool.query('SELECT id_producto AS id, nombre_producto AS nombre, precio, imagen FROM producto WHERE id_tienda = $1', [brandId]);
+    const result = await pool.query(
+      'SELECT id_producto AS id, nombre_producto AS nombre, precio, imagen FROM producto WHERE id_tienda = $1',
+      [brandId]
+    );
     res.json(result.rows);
   } catch (error) {
     console.error('Error fetching brand products:', error);
@@ -210,6 +213,93 @@ app.post('/confirmarPedido', async (req, res) => {
   } catch (error) {
     console.error('Error al confirmar el pedido:', error);
     res.status(500).json({ error: 'Error al confirmar el pedido' });
+  }
+});
+
+// Ruta para obtener marcas (tiendas)
+app.get('/marcas', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM marcas');
+    res.json(result.rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error al obtener las marcas');
+  }
+});
+
+// Ruta para obtener productos de una tienda específica
+app.get('/store/:id_tienda/products', async (req, res) => {
+  const { id_tienda } = req.params;
+  try {
+    const result = await pool.query('SELECT * FROM productos WHERE id_tienda = $1', [id_tienda]);
+    res.json(result.rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error al obtener los productos de la tienda');
+  }
+});
+
+// Ruta para obtener detalles de una tienda
+app.get('/store/:id_tienda', async (req, res) => {
+  const { id_tienda } = req.params;
+  try {
+    const result = await pool.query('SELECT * FROM tiendas WHERE id = $1', [id_tienda]);
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error al obtener los detalles de la tienda');
+  }
+});
+
+// Ruta para obtener los detalles de una tienda
+app.get('/tiendaDatos', async (req, res) => {
+  const { id_tienda } = req.query;  // Obtiene el id_tienda de la consulta
+
+  if (!id_tienda) {
+    return res.status(400).json({ error: 'El id_tienda es obligatorio' });
+  }
+
+  try {
+    const result = await pool.query(
+      'SELECT nombre, ubicacion, t_categoria, telefono, imagen FROM tienda WHERE id_tienda = $1',
+      [id_tienda]
+    );
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'No se encontró la tienda' });
+    }
+    
+    res.json(result.rows[0]);  // Envía los detalles de la tienda
+    
+  } catch (error) {
+    console.error('Error al obtener los detalles de la tienda:', error);
+    res.status(500).json({ error: 'Error al obtener los detalles de la tienda' });
+  }
+});
+
+// Ruta para obtener los detalles del producto
+app.get('/productoDatos', async (req, res) => {
+  const { id_producto } = req.query;  // Obtiene el producto de la consulta
+
+  if (!id_producto) {
+    return res.status(400).json({ error: 'El id_producto es obligatorio' });
+  }
+
+  try {
+    const result = await pool.query(
+      'SELECT nombre_producto, descripcion, precio, categoria, dimensiones, existencias, iva, peso, imagen, id_tienda FROM producto WHERE id_producto = $1',
+      [id_producto]
+    );
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'No se encontró la tienda' });
+    }
+    
+    res.json(result.rows[0]);  // Envía los detalles de la tienda
+    
+  } catch (error) {
+    console.error('Error al obtener los detalles del producto:', error);
+    res.status(500).json({ error: 'Error al obtener los detalles del producto' });
   }
 });
 

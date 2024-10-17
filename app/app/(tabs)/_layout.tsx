@@ -5,7 +5,8 @@ import React from 'react';
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { CartProvider } from '../(tabs)/CartContext'; // Importa tu CartProvider
+import { CartProvider } from '../(tabs)/CartContext'; 
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -17,28 +18,41 @@ export default function TabLayout() {
         
         screenOptions = {{
           tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+          
+          tabBarStyle: {
+            height: 80, 
+            paddingBottom: 10,
+            paddingTop: 10,
+            backgroundColor: '#ffffff', 
+            borderTopWidth: 1, 
+            borderTopColor: '#ddd', 
+          },
+
+          tabBarLabelStyle: {
+            fontSize: 14, 
+            fontWeight: 'bold', 
+            color: '#00C1A5'
+          },
+
         }}
       >
-        {/* Pantalla de Home (index), aquí la barra de navegación estará habilitada */}
+    
         <Tabs.Screen
           name = "home"
           options = {{
             title: 'Home',
-            tabBarStyle: { display: 'flex' }, // Muestra la barra de navegación
             tabBarIcon: ({ color, focused }) => (
-              <TabBarIcon name={focused ? 'home' : 'home-outline'} color = {color} />
+              <MaterialCommunityIcons name = {focused ? 'home' : 'home-outline'} size = {30} color = {'#00C1A5'}/>
             ),
           }}
         />
 
         <Tabs.Screen
-          name = "ConfirmacionPedidoScreen"
+          name = "Carrito"
           options = {{
             title: 'Carrito',
-            tabBarStyle: { display: 'flex' }, // Muestra la barra de navegación
             tabBarIcon: ({ color, focused }) => (
-              <TabBarIcon name = {focused ? 'cart' : 'cart-outline'} color={color} />
-
+              <MaterialCommunityIcons name = {focused ? 'cart' : 'cart-outline'} size = {30} color = {'#00C1A5'}/>
             ),
           }}
         />
@@ -47,18 +61,20 @@ export default function TabLayout() {
           name = "HistorialPedidoScreen"
           options = {{
             title: 'Pedidos',
-            tabBarStyle: { display: 'flex' }, // Muestra la barra de navegación
             tabBarIcon: ({ color, focused }) => (
-              <TabBarIcon name = {focused ? 'history' : 'history-outline'} color = {color} />
-
+              <MaterialCommunityIcons name = {focused ? 'package-variant' : 'package-variant-closed'} size = {30} color = {'#00C1A5'}/>
             ),
           }}
         />
 
-        {/* Pantalla de Registro, aquí la barra de navegación estará deshabilitada */}
-        
-        {/* Pantalla de Recuperar Contraseña, aquí también estará deshabilitada */}
-        
+        <Tabs.Screen
+          name = "StoreDetails/[id_tienda]"
+          options  ={{
+            headerShown: false, // Oculta la barra de navegación para esta pantalla
+            tabBarStyle: { display: 'none' }, // Esconde la barra de tabs
+          }}
+        />
+
       </Tabs>
     </CartProvider>
   );
