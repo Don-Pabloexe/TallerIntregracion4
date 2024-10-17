@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; // Para el ícono del candado
 import { sendPasswordResetEmail } from 'firebase/auth'; // Función de Firebase
-import { auth } from '../../scripts/firebaseConfig'; // Asegúrate de que la ruta sea correcta
+import { auth } from '../scripts/firebaseConfig'; // Asegúrate de que la ruta sea correcta
 import { useRouter } from 'expo-router';
 
 const ForgotPasswordScreen = () => {

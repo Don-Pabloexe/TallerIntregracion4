@@ -7,9 +7,10 @@ import { useRouter } from "expo-router"; // Para manejar la navegación
 const RegisterScreen = () => {
   const router = useRouter(); // Hook para navegación
   const [email, setEmail] = useState("");
-  const [fullname, setFullname] = useState("");
-  const [username, setUsername] = useState("");
-  const [rut, setRut] = useState(""); // Nuevo campo de RUT
+  const [nombre, setNombre] = useState(""); // Modificado: campo Nombre
+  const [apellido, setApellido] = useState(""); // Modificado: campo Apellido
+  const [rut, setRut] = useState(""); // Modificado: Nuevo campo de RUT
+  const [telefono, setTelefono] = useState(""); // Modificado: Nuevo campo de Teléfono
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -26,9 +27,10 @@ const RegisterScreen = () => {
       // Hacer la solicitud POST al servidor para registrar el usuario
       const response = await axios.post('http://localhost:5000/register', {
         email,
-        fullname,
-        username,
-        rut,
+        nombre,  // Actualizado
+        apellido, // Actualizado
+        rut,  // Actualizado
+        telefono,  // Actualizado
         password
       });
 
@@ -58,9 +60,16 @@ const RegisterScreen = () => {
       />
 
       <TextInput
-        value={fullname}
-        onChangeText={setFullname}
-        placeholder="Nombre Completo"
+        value={nombre} // Actualizado: nombre
+        onChangeText={setNombre} // Actualizado
+        placeholder="Nombre"
+        style={styles.input}
+      />
+
+      <TextInput
+        value={apellido} // Actualizado: apellido
+        onChangeText={setApellido} // Actualizado
+        placeholder="Apellido"
         style={styles.input}
       />
 
@@ -72,10 +81,12 @@ const RegisterScreen = () => {
         style={styles.input}
       />
 
+      {/* Campo de Teléfono */}
       <TextInput
-        value={username}
-        onChangeText={setUsername}
-        placeholder="Nombre de Usuario"
+        value={telefono}
+        onChangeText={setTelefono}
+        placeholder="Teléfono"
+        keyboardType="phone-pad"
         style={styles.input}
       />
 
@@ -144,12 +155,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 20,
   },
+
   title: {
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 30,
     color: "#00BFA6",
   },
+
   input: {
     backgroundColor: "#FFFFFF",
     width: "100%",
@@ -159,6 +172,7 @@ const styles = StyleSheet.create({
     borderColor: "#00BFA6",
     borderWidth: 1,
   },
+
   passwordContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -170,12 +184,15 @@ const styles = StyleSheet.create({
     borderColor: "#00BFA6",
     borderWidth: 1,
   },
+
   inputPassword: {
     flex: 1,
   },
+
   icon: {
     marginLeft: 10,
   },
+
   registerButton: {
     backgroundColor: "#00BFA6",
     width: "100%",
@@ -184,11 +201,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 20,
   },
+
   registerButtonText: {
     color: "#FFFFFF",
     fontSize: 18,
     fontWeight: "bold",
   },
+
   backButton: {
     backgroundColor: "#A6A6A6",
     width: "100%",
@@ -197,15 +216,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 10,
   },
+
   backButtonText: {
     color: "#FFFFFF",
     fontSize: 18,
     fontWeight: "bold",
   },
+
   message: {
     marginTop: 20,
     color: "red",
   },
+  
 });
 
 export default RegisterScreen;

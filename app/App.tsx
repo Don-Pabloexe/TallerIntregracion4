@@ -4,6 +4,10 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '@/scripts/firebaseConfig'; // Importa tu configuración de Firebase
 import { useRouter } from 'expo-router'; // Para la navegación
 
+
+const orderRoutes = require('./orders'); // Ajusta el nombre del archivo si es necesario
+app.use('/api', orderRoutes);
+
 export default function App() {
   const [initializing, setInitializing] = useState(true); // Mostrar un indicador de carga mientras se verifica el estado
   const [user, setUser] = useState(null); // Estado para guardar el usuario autenticado
