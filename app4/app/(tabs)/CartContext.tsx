@@ -7,7 +7,7 @@ interface Product {
   Nombre_Producto: string;  // Campo que corresponde al nombre del producto
   Precio: number;  // Campo que corresponde al precio
   Imagen: string;  // Campo que corresponde a la imagen
-  ID_Tienda: number;
+  id_tienda: number;
   
 }
 

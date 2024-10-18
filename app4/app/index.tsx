@@ -22,7 +22,7 @@ export default function IndexScreen() {
 
     try {
       // Petición al backend para iniciar sesión
-      const response = await axios.post('http://localhost:5000/login', {
+      const response = await axios.post('http://192.168.101.6:5000/login', {
         email, // Correo ingresado
         password // Contraseña ingresada
       });

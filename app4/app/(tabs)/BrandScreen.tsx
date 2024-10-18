@@ -29,7 +29,7 @@ const BrandScreen: React.FC<BrandScreenProps> = ({ route }) => {
     const fetchBrandProducts = async () => {
       try {
         // Hacer la solicitud GET al servidor para obtener los productos de una tienda específica
-        const response = await axios.get(`http://localhost:5000/marcas/${brandId}/products`);
+        const response = await axios.get(`http://192.168.101.6:5000/marcas/${brandId}/products`);
   
         // Manejar la respuesta
         const data: Product[] = response.data; // Define los datos como un array de Product

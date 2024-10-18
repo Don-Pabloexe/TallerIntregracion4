@@ -25,7 +25,7 @@ const RegisterScreen = () => {
 
     try {
       // Hacer la solicitud POST al servidor para registrar el usuario
-      const response = await axios.post('http://localhost:5000/register', {
+      const response = await axios.post('http://192.168.101.6:5000/register', {
         email,
         nombre,  // Actualizado
         apellido, // Actualizado
