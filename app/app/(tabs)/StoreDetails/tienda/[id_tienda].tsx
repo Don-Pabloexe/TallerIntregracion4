@@ -50,7 +50,7 @@ export default function StoreDetails() {
           <View>
 
             <View>
-              <Image style = {styles.img} source = {storeDetails.imagen}/>
+              <Image style = {styles.img} source = {{ uri: storeDetails.imagen }}/>
               
               <Text style = {styles.textoImagen1}>{storeDetails.nombre}</Text>
               <Text style = {styles.textoImagen2}>{storeDetails.ubicacion}</Text>
@@ -118,7 +118,6 @@ const styles = StyleSheet.create({
   },
 
   img: {
-    flex: 1,
     width: '100%',
     height: 250,
     opacity: 0.45
@@ -187,7 +186,7 @@ const styles = StyleSheet.create({
   contactoContainer: {
     flexDirection: 'row',
     marginLeft: 50,
-    marginTop: 120,
+    marginTop: 50,
   },
 
   textoContacto: {
@@ -200,7 +199,7 @@ const styles = StyleSheet.create({
   },
 
   iconoWsp: {
-    width: '30%',
+    width: '100%',
   }
 
 });

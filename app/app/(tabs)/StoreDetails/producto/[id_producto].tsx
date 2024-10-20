@@ -52,7 +52,7 @@ export default function ProductoDetails() {
       <View>
 
         <View>
-          <Image style = {styles.img} source = {productoDetails.imagen}/>
+          <Image style = {styles.img} source = {{ uri: productoDetails.imagen }}/>
 
           <Text style = {styles.textoImagen1}>{productoDetails.nombre_producto}</Text>
           <Text style = {styles.textoImagen2}>{productoDetails.categoria}</Text>  
@@ -129,7 +129,6 @@ const styles = StyleSheet.create({
   },
 
   img: {
-    flex: 1,
     width: '100%',
     height: 250,
     opacity: 0.45
@@ -203,7 +202,7 @@ const styles = StyleSheet.create({
   },
 
   iconoWsp: {
-    width: '30%',
+    width: '100%',
   }
 
 });

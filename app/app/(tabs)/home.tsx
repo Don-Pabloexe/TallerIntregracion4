@@ -166,7 +166,7 @@ export default function HomeScreen() {
 
   return (
     <ScrollView style=  {styles.container}>
-      <HorizontalBrandCarousel marcas = {marcas} />  {/* Muestra las tiendas */}
+      <HorizontalBrandCarousel marcas = {marcas} />  
       <VerticalProductList products = {products} />  
     </ScrollView>
   );
