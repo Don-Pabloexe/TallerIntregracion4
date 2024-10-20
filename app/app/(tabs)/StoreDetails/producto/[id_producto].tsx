@@ -16,7 +16,7 @@ export default function ProductoDetails() {
   useEffect(() => {
     const fetchProductoDetails = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/productoDatos`, {
+        const response = await axios.get(`http://192.168.2.104:5000/productoDatos`, {
           params: { id_producto },
         });
         setProductoDetails(response.data);

@@ -145,11 +145,11 @@ export default function HomeScreen() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const marcasResponse = await axios.get('http://localhost:5000/marcas');
+        const marcasResponse = await axios.get('http://192.168.2.104:5000/marcas');
         const marcasData: Marca[] = marcasResponse.data;
         setMarcas(marcasData);
 
-        const productsResponse = await axios.get('http://localhost:5000/products');
+        const productsResponse = await axios.get('http://192.168.2.104:5000/products');
         const productsData = productsResponse.data;
         console.log("Datos de productos:", productsData);  // Verifica qué datos están llegando
         setProducts(productsData);
@@ -167,7 +167,7 @@ export default function HomeScreen() {
   return (
     <ScrollView style=  {styles.container}>
       <HorizontalBrandCarousel marcas = {marcas} />  {/* Muestra las tiendas */}
-      <VerticalProductList products = {products} />  {/* Muestra los productos */}
+      <VerticalProductList products = {products} />  
     </ScrollView>
   );
 }
