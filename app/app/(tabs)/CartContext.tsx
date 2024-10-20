@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { View, Text, TouchableOpacity, FlatList, Modal, StyleSheet, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -8,9 +9,7 @@ interface Product {
   Precio: number;  // Campo que corresponde al precio
   Imagen: string;  // Campo que corresponde a la imagen
   ID_Tienda: number;
-  
 }
-
 
 interface CartContextType {
   items: Product[];

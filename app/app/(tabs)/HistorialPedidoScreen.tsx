@@ -17,7 +17,7 @@ const HistorialPedidoScreen = () => {
           return;
         }
 
-        const response = await axios.get('http://localhost:5000/historialPedido', {
+        const response = await axios.get('http://192.168.1.95:5000/historialPedido', {
           params: { id_usuario }, // Envía el id_usuario en los parámetros de la solicitud
         });
 
