@@ -54,7 +54,7 @@ const ConfirmacionPedidoScreen = () => {
         comentario: comentario
       };
 
-      await axios.post('http://192.168.2.104:5000/confirmarPedido', pedido);
+      await axios.post('http://localhost:5000/confirmarPedido', pedido);
       clearCart();
       setModalVisible(false); // Cerrar el modal solo después de que se confirme el pedido
       router.push('/home');

@@ -58,7 +58,7 @@ const HorizontalBrandCarousel: React.FC<{ marcas: Marca[] }> = ({ marcas }) => {
             style = {styles.card}
             onPress = {() => {
               router.push({
-                pathname: `/StoreDetails/tienda/${item.id}`, 
+                pathname: `../StoreDetails/tienda/${item.id}`, 
                 params: { id_tienda: item.id }
               });
             }}
@@ -87,7 +87,7 @@ const VerticalProductList: React.FC<{ products: Product[] }> = ({ products }) =>
         style={{ alignContent: 'center', alignItems: 'center' }}
         onPress={() => {
           router.push({
-            pathname: `/StoreDetails/producto/${item.id}`, 
+            pathname: `../StoreDetails/producto/${item.id}`, 
             params: { id_producto: item.id }
           });
         }}
@@ -145,11 +145,11 @@ export default function HomeScreen() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const marcasResponse = await axios.get('http://192.168.2.104:5000/marcas');
+        const marcasResponse = await axios.get('http://localhost:5000/marcas');
         const marcasData: Marca[] = marcasResponse.data;
         setMarcas(marcasData);
 
-        const productsResponse = await axios.get('http://192.168.2.104:5000/products');
+        const productsResponse = await axios.get('http://localhost:5000/products');
         const productsData = productsResponse.data;
         console.log("Datos de productos:", productsData);  // Verifica qué datos están llegando
         setProducts(productsData);

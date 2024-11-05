@@ -48,6 +48,16 @@ export default function TabLayout() {
         />
 
         <Tabs.Screen
+          name = "Buscador"
+          options = {{
+            title: 'Buscador',
+            tabBarIcon: ({ color, focused }) => (
+              <MaterialCommunityIcons name = {focused ? 'magnify-plus-cursor' : 'magnify'} size = {30} color = {'#00C1A5'}/>
+            ),
+          }}
+        />
+
+        <Tabs.Screen
           name = "Carrito"
           options = {{
             title: 'Carrito',
@@ -64,14 +74,6 @@ export default function TabLayout() {
             tabBarIcon: ({ color, focused }) => (
               <MaterialCommunityIcons name = {focused ? 'package-variant' : 'package-variant-closed'} size = {30} color = {'#00C1A5'}/>
             ),
-          }}
-        />
-
-        <Tabs.Screen
-          name = "StoreDetails/[id_tienda]"
-          options  ={{
-            headerShown: false, // Oculta la barra de navegación para esta pantalla
-            tabBarStyle: { display: 'none' }, // Esconde la barra de tabs
           }}
         />
 

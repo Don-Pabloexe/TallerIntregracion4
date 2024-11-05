@@ -303,6 +303,33 @@ app.get('/productoDatos', async (req, res) => {
   }
 });
 
+app.get('/productosBusqueda', async (req, res) => {
+  const { search } = req.query;  // Captura el parámetro de búsqueda
+  try {
+    let query = 'SELECT * FROM producto';
+    let queryParams = [];
+
+    if (search) {
+      
+      query += ' WHERE nombre_producto ILIKE $1 OR descripcion ILIKE $1';
+      queryParams.push(`%${search}%`);
+    }
+
+    query += ' ORDER BY id_producto ASC'; 
+
+    const result = await pool.query(query, queryParams);
+    
+    if (result.rows.length === 0) {
+      return res.status(404).send('No se encontraron productos');
+    }
+
+    res.json(result.rows); 
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error al obtener los productos');
+  }
+});
+
 app.listen(port, () => {
   console.log(`Servidor corriendo en http://localhost:${port}`);
 });
