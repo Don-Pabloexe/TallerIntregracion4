@@ -178,7 +178,7 @@ app.get('/historialPedido', async (req, res) => {
 
   try {
     const result = await pool.query(
-      'SELECT fecha_pedido, precio_total, direccion, sector, comentarios FROM pedido WHERE id_usuario = $1',
+      'SELECT id_pedido, fecha_pedido, precio_total, direccion, sector, comentarios, estado FROM pedido WHERE id_usuario = $1',
       [id_usuario]
     );
     res.json(result.rows);
@@ -201,9 +201,9 @@ app.post('/confirmarPedido', async (req, res) => {
 
     // Insertar el pedido en la tabla 'pedido'
     const result = await pool.query(
-      `INSERT INTO pedido (fecha_pedido, precio_total, iva, direccion, id_usuario, id_tienda, sector, comentarios)
-       VALUES (NOW(), $1, $2, $3, $4, $5, $6, $7) RETURNING id_pedido`,
-      [total, total * 0.19, direccion, idUsuario, tienda, sector, comentario] // Añade sector y comentario aquí
+      `INSERT INTO pedido (fecha_pedido, precio_total, iva, direccion, id_usuario, id_tienda, sector, comentarios, estado)
+       VALUES (NOW(), $1, $2, $3, $4, $5, $6, $7, $8) RETURNING id_pedido`,
+      [total, total * 0.19, direccion, idUsuario, tienda, sector, comentario, 0] // Añade sector, comentario y estado aquí
     );
 
     const pedidoId = result.rows[0].id_pedido;
@@ -215,6 +215,7 @@ app.post('/confirmarPedido', async (req, res) => {
     res.status(500).json({ error: 'Error al confirmar el pedido' });
   }
 });
+
 
 // Ruta para obtener marcas (tiendas)
 app.get('/marcas', async (req, res) => {

@@ -16,7 +16,7 @@ export default function StoreDetails() {
   useEffect(() => {
     const fetchStoreDetails = async () => {
       try {
-        const response = await axios.get(`http:/localhost:5000/tiendaDatos`, {
+        const response = await axios.get(`http://localhost:5000/tiendaDatos`, {
           params: { id_tienda },
         });
         setStoreDetails(response.data);
