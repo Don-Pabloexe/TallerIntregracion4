@@ -29,7 +29,6 @@ const EnviarCorreo = () => {
       setMensaje('Error al conectarse con el servidor');
     }
   };
-  
 
   return (
     <View>

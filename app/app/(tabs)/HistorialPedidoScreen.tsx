@@ -3,12 +3,14 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, ActivityIndicator, Modal, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { useRouter } from 'expo-router';
 
 const HistorialPedidoScreen = () => {
   const [pedidos, setPedidos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [pedidoSeleccionado, setPedidoSeleccionado] = useState(null);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchPedidos = async () => {
@@ -41,10 +43,27 @@ const HistorialPedidoScreen = () => {
       </View>
     );
   }
+  
+  if (pedidos.length === 0) {
+    return (
+      <View style={styles.container}>
+        <Text>No se han encontrado pedidos.</Text>
+      </View>
+    );
+  }
 
   const handlePress = (pedido) => {
     setPedidoSeleccionado(pedido); // Guarda el pedido seleccionado
     setModalVisible(true); // Muestra el modal
+  };
+
+  const handleEntregaDetails = (id_pedido) => {
+    if (!id_pedido) {
+      console.error('id_pedido es undefined o null');
+      return;
+    }
+    console.log('Navegando a /StoreDetails/entrega/' + id_pedido);
+    router.push(`/StoreDetails/entrega/${id_pedido}`);
   };
 
   const getCircleColor = (estado, circuloNumero) => {
@@ -95,24 +114,57 @@ const HistorialPedidoScreen = () => {
                   <View style = {[styles.estadoCirculo3, { backgroundColor: getCircleColor(pedidoSeleccionado.estado, 2) }]} />
                 </View>
 
-                <View style = {styles.textoEstadoContainer}>
+                <View style = {styles.textoEstadoContainer1}>
                   <Text style = {styles.textoEstado1}>Preparando el pedido</Text>
                   <Text style = {styles.textoEstado2}>En despacho</Text>
                   <Text style = {styles.textoEstado3}>Entregado</Text>
                 </View>
 
-                <View style = {styles.textoEstadoContainer}>
+                <View style = {styles.textoEstadoContainer2}>
                   <Text style = {styles.DescripcionEstado1}>Tu pedido se esta preparando en nuestro centro de distribución</Text>
                   <Text style = {styles.DescripcionEstado2}>Tu pedido se encuentra en despacho y llegará pronto a tu dirección</Text>
                   <Text style = {styles.DescripcionEstado3}>El pedido fue entregado y recibido. Revisa aquí los datos del receptor</Text>
                 </View>
 
-                <TouchableOpacity
-                  style = {styles.closeButton}
-                  onPress = {() => setModalVisible(false)}
-                >
-                  <Text style = {styles.closeButtonText}>Cerrar</Text>
-                </TouchableOpacity>
+                <View>
+
+                  <FlatList
+                    data = {[pedidoSeleccionado]}
+                    keyExtractor={(item) => item.id_pedido.toString()}
+                    renderItem = {({ item }) => (
+
+                  <TouchableOpacity style = {[ styles.EstadoEntregaButton,
+
+                      {
+                        backgroundColor:
+                          pedidoSeleccionado.estado === 0 || pedidoSeleccionado.estado === 1
+                            ? '#CCCCCC' // Color gris cuando está deshabilitado
+                            : getCircleColor(pedidoSeleccionado.estado, 2),
+                      }
+                    ]}
+
+                    onPress = {() => {
+
+                      if (pedidoSeleccionado.estado !== 0 && pedidoSeleccionado.estado !== 1) {
+                          setModalVisible(false)
+                          handleEntregaDetails(pedidoSeleccionado.id_pedido);
+                        }}
+                      }
+
+                    disabled = {pedidoSeleccionado.estado === 0 || pedidoSeleccionado.estado === 1}>
+                    
+                    <Text style = {styles.closeButtonText}>Revisa aquí los datos de entrega</Text>
+                  </TouchableOpacity>
+                  )}/>
+                </View>
+
+
+                <View>
+                  <TouchableOpacity style = {styles.closeButton} onPress = {() => setModalVisible(false)}>
+                    <Text style = {styles.closeButtonText}>Cerrar</Text>
+                  </TouchableOpacity>
+                </View>
+
               </>
             )}
           </View>
@@ -175,8 +227,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     padding: 20,
     borderRadius: 10,
-    width: '80%',
-    height: '50%'
   },
 
   modalTitle: {
@@ -190,14 +240,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignContent: 'center',
     alignSelf: 'center',
-    margin: 30
+    margin: 30,
   },
 
-  textoEstadoContainer: {
+  textoEstadoContainer1: {
     flexDirection: 'row',
     alignContent: 'center',
     alignSelf: 'center',
-    margin: -10
+  },
+
+  textoEstadoContainer2: {
+    flexDirection: 'row',
+    alignContent: 'center',
+    alignSelf: 'center',
+    marginBottom: 80,
   },
 
   textoEstado1: {
@@ -291,16 +347,34 @@ const styles = StyleSheet.create({
   },
 
   closeButton: {
-    marginTop: 110,
     backgroundColor: '#00C1A5',
     padding: 10,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 20
+  },
+
+  entregaButton: {
+    backgroundColor: '#00C1A5',
     borderRadius: 5,
     alignItems: 'center',
   },
 
   closeButtonText: {
+    textAlign: 'center',
     color: 'white',
     fontWeight: 'bold',
+  },
+
+  EstadoEntregaButton: {
+    alignSelf: 'center',
+    backgroundColor: '#00C1A5',
+    alignItems: 'center',
+    borderRadius: 50,
+    width: 200,
+    height: 60,
+    marginVertical: 20,
+    padding: 10,
   },
 });
 

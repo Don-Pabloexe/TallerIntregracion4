@@ -118,7 +118,6 @@ app.post('/login', async (req, res) => {
   }
 });
 
-
 // Ruta para restablecer contraseña (simulado)
 app.post('/reset-password', async (req, res) => {
   const { email } = req.body;
@@ -155,7 +154,6 @@ app.get('/products', async (req, res) => {
   }
 });
 
-
 // Ruta para obtener todas las marcas (tiendas)
 app.get('/marcas', async (req, res) => {
   try {
@@ -184,28 +182,6 @@ app.get('/marcas/:brandId/products', async (req, res) => {
   }
 });
 
-// Ruta para procesar el pago
-app.post('/procesarPago', async (req, res) => {
-  const { idPedido, metodoPago } = req.body;
-
-  try {
-    // Simulamos un pago exitoso. Aquí podrías integrar un servicio de pago real como Stripe, PayPal, etc.
-    const estadoPago = 'completado';
-
-    // Actualizamos el pedido para cambiar el estado del pago a 'completado'
-    await pool.query(
-      'UPDATE pedidos SET estado_pago = $1 WHERE id_pedido = $2',
-      [estadoPago, idPedido]
-    );
-
-    // Responder con éxito
-    res.status(200).json({ message: 'Pago procesado exitosamente', id_pedido: idPedido, estado_pago: estadoPago });
-  } catch (error) {
-    console.error('Error al procesar el pago:', error);
-    res.status(500).json({ error: 'Error al procesar el pago' });
-  }
-});
-
 // Ruta para obtener todos los pedidos
 app.get('/historialPedido', async (req, res) => {
   const { id_usuario } = req.query; // Obtiene el id_usuario de la consulta
@@ -227,9 +203,31 @@ app.get('/historialPedido', async (req, res) => {
   }
 });
 
+app.get('/DatosEntregaPedido', async (req, res) => {
+  const { id_pedido } = req.query; // Asegúrate de que este parámetro sea correcto
+
+  if (!id_pedido) {
+    return res.status(400).json({ error: 'El id_pedido es obligatorio' });
+  }
+
+  try {
+    const result = await pool.query(
+      'SELECT id_pedido, fecha_pedido, precio_total, direccion, sector, comentarios, estado, nombre_receptor, hora_pedido, rut_receptor FROM pedido WHERE id_pedido = $1',
+      [id_pedido]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Pedido no encontrado' });
+    }
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Error al obtener detalles de pedido:', error);
+    res.status(500).json({ error: 'Error al obtener detalles de pedido' });
+  }
+});
+
 // Confirmar pedido y registrar en la base de datos
 app.post('/confirmarPedido', async (req, res) => {
-  const { total, idUsuario, tienda, direccion, sector, comentario } = req.body; // Agrega sector y comentario
+  const { total, idUsuario, tienda, direccion, sector, comentario, hora } = req.body; // Agrega sector y comentario
 
   try {
     // Validar que todos los datos requeridos están presentes
@@ -239,8 +237,8 @@ app.post('/confirmarPedido', async (req, res) => {
 
     // Insertar el pedido en la tabla 'pedido'
     const result = await pool.query(
-      `INSERT INTO pedido (fecha_pedido, precio_total, iva, direccion, id_usuario, id_tienda, sector, comentarios, estado)
-       VALUES (NOW(), $1, $2, $3, $4, $5, $6, $7, $8) RETURNING id_pedido`,
+      `INSERT INTO pedido (fecha_pedido, precio_total, iva, direccion, id_usuario, id_tienda, sector, comentarios, estado, hora_pedido)
+       VALUES (NOW(), $1, $2, $3, $4, $5, $6, $7, $8, NOW()) RETURNING id_pedido`,
       [total, total * 0.19, direccion, idUsuario, tienda, sector, comentario, 0] // Añade sector, comentario y estado aquí
     );
 
@@ -253,7 +251,6 @@ app.post('/confirmarPedido', async (req, res) => {
     res.status(500).json({ error: 'Error al confirmar el pedido' });
   }
 });
-
 
 // Ruta para obtener marcas (tiendas)
 app.get('/marcas', async (req, res) => {
