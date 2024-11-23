@@ -1,10 +1,16 @@
+<<<<<<< HEAD
 
+=======
+>>>>>>> 00b6715a8bb3dafa6cb740b5896397787a9dffaf
 const express = require('express');
 const { Pool } = require('pg');
 const bcrypt = require('bcrypt'); // Para encriptar contraseñas
 const cors = require('cors');
+<<<<<<< HEAD
 const nodemailer = require('nodemailer');
 const { Client } = require('pg');
+=======
+>>>>>>> 00b6715a8bb3dafa6cb740b5896397787a9dffaf
 
 const app = express();
 const port = 5000;
@@ -22,6 +28,7 @@ const pool = new Pool({
   port: 5432,           // Puerto de PostgreSQL
 });
 
+<<<<<<< HEAD
 // Configuración de Nodemailer
 const transporter = nodemailer.createTransport({
   service: 'gmail', // o el servicio que desees
@@ -58,6 +65,8 @@ app.post('/enviar-correo', async (req, res) => {
   }
 });
 
+=======
+>>>>>>> 00b6715a8bb3dafa6cb740b5896397787a9dffaf
 // Ruta para registrar un nuevo usuario
 app.post('/register', async (req, res) => {
   const { nombre, apellido, email, password, telefono, rut } = req.body;
@@ -118,6 +127,10 @@ app.post('/login', async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 00b6715a8bb3dafa6cb740b5896397787a9dffaf
 // Ruta para restablecer contraseña (simulado)
 app.post('/reset-password', async (req, res) => {
   const { email } = req.body;
@@ -146,7 +159,11 @@ app.post('/reset-password', async (req, res) => {
 // Obtener todos los productos
 app.get('/products', async (req, res) => {
   try {
+<<<<<<< HEAD
     const result = await pool.query('SELECT id_producto AS id, nombre_producto AS nombre, precio, id_tienda FROM producto');
+=======
+    const result = await pool.query('SELECT id_producto AS id, nombre_producto AS nombre, precio, imagen, id_tienda FROM producto');
+>>>>>>> 00b6715a8bb3dafa6cb740b5896397787a9dffaf
     res.json(result.rows);
   } catch (error) {
     console.error('Error fetching products:', error);
@@ -154,18 +171,28 @@ app.get('/products', async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 // Ruta para obtener todas las marcas (tiendas)
 app.get('/marcas', async (req, res) => {
   try {
     const result = await pool.query('SELECT id_tienda AS id, nombre FROM tienda');
     res.json(result.rows);
   
+=======
+
+// Ruta para obtener todas las marcas (tiendas)
+app.get('/marcas', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT id_tienda AS id, nombre, imagen FROM tienda');
+    res.json(result.rows);
+>>>>>>> 00b6715a8bb3dafa6cb740b5896397787a9dffaf
   } catch (error) {
     console.error('Error fetching marcas:', error);
     res.status(500).json({ error: 'Error fetching marcas' });
   }
 });
 
+<<<<<<< HEAD
 // Ruta para obtener productos de una marca específica
 app.get('/marcas/:brandId/products', async (req, res) => {
   const { brandId } = req.params;
@@ -175,6 +202,15 @@ app.get('/marcas/:brandId/products', async (req, res) => {
       'SELECT id_producto AS id, nombre_producto AS nombre, precio, imagen FROM producto WHERE id_tienda = $1',
       [brandId]
     );
+=======
+
+// Ruta para obtener productos de una marca específica
+app.get('/marcas/:brandId/products', async (req, res) => {
+  const { brandId } = req.params;
+  
+  try {
+    const result = await pool.query('SELECT id_producto AS id, nombre_producto AS nombre, precio, imagen FROM producto WHERE id_tienda = $1', [brandId]);
+>>>>>>> 00b6715a8bb3dafa6cb740b5896397787a9dffaf
     res.json(result.rows);
   } catch (error) {
     console.error('Error fetching brand products:', error);
@@ -182,6 +218,7 @@ app.get('/marcas/:brandId/products', async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 // Ruta para obtener todos los pedidos
 app.get('/historialPedido', async (req, res) => {
   const { id_usuario } = req.query; // Obtiene el id_usuario de la consulta
@@ -222,10 +259,32 @@ app.get('/DatosEntregaPedido', async (req, res) => {
   } catch (error) {
     console.error('Error al obtener detalles de pedido:', error);
     res.status(500).json({ error: 'Error al obtener detalles de pedido' });
+=======
+// Ruta para procesar el pago
+app.post('/procesarPago', async (req, res) => {
+  const { idPedido, metodoPago } = req.body;
+
+  try {
+    // Simulamos un pago exitoso. Aquí podrías integrar un servicio de pago real como Stripe, PayPal, etc.
+    const estadoPago = 'completado';
+
+    // Actualizamos el pedido para cambiar el estado del pago a 'completado'
+    await pool.query(
+      'UPDATE pedidos SET estado_pago = $1 WHERE id_pedido = $2',
+      [estadoPago, idPedido]
+    );
+
+    // Responder con éxito
+    res.status(200).json({ message: 'Pago procesado exitosamente', id_pedido: idPedido, estado_pago: estadoPago });
+  } catch (error) {
+    console.error('Error al procesar el pago:', error);
+    res.status(500).json({ error: 'Error al procesar el pago' });
+>>>>>>> 00b6715a8bb3dafa6cb740b5896397787a9dffaf
   }
 });
 
 // Confirmar pedido y registrar en la base de datos
+<<<<<<< HEAD
 app.post('/confirmarPedido', async (req, res) => {
   const { total, idUsuario, tienda, direccion, sector, comentario, hora } = req.body; // Agrega sector y comentario
 
@@ -240,6 +299,23 @@ app.post('/confirmarPedido', async (req, res) => {
       `INSERT INTO pedido (fecha_pedido, precio_total, iva, direccion, id_usuario, id_tienda, sector, comentarios, estado, hora_pedido)
        VALUES (NOW(), $1, $2, $3, $4, $5, $6, $7, $8, NOW()) RETURNING id_pedido`,
       [total, total * 0.19, direccion, idUsuario, tienda, sector, comentario, 0] // Añade sector, comentario y estado aquí
+=======
+// Confirmar pedido y registrar en la base de datos
+app.post('/confirmarPedido', async (req, res) => {
+  const { total, idUsuario, tienda, direccion, idDespacho } = req.body;  // Agregamos idDespacho
+
+  try {
+    // Validar que todos los datos requeridos están presentes
+    if (!total || !idUsuario || !tienda || !direccion || !idDespacho) {
+      return res.status(400).json({ error: 'Faltan datos en la solicitud.' });
+    }
+
+    // Insertar el pedido en la tabla 'pedido' con los datos proporcionados
+    const result = await pool.query(
+      `INSERT INTO pedido (fecha_pedido, precio_total, iva, direccion, id_usuario, id_tienda, id_despacho)
+       VALUES (NOW(), $1, $2, $3, $4, $5, $6) RETURNING id_pedido`,
+      [total, total * 0.19, direccion, idUsuario, tienda, idDespacho]  // Incluimos idDespacho en la consulta
+>>>>>>> 00b6715a8bb3dafa6cb740b5896397787a9dffaf
     );
 
     const pedidoId = result.rows[0].id_pedido;
@@ -252,6 +328,7 @@ app.post('/confirmarPedido', async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 // Ruta para obtener marcas (tiendas)
 app.get('/marcas', async (req, res) => {
   try {
@@ -365,6 +442,17 @@ app.get('/productosBusqueda', async (req, res) => {
     res.status(500).send('Error al obtener los productos');
   }
 });
+=======
+
+
+
+
+
+
+
+
+
+>>>>>>> 00b6715a8bb3dafa6cb740b5896397787a9dffaf
 
 app.listen(port, () => {
   console.log(`Servidor corriendo en http://localhost:${port}`);
