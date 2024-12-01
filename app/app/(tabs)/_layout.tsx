@@ -2,80 +2,83 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
 
-import { TabBarIcon } from '@/components/navigation/TabBarIcon';
+import { MaterialCommunityIcons } from 'react-native-vector-icons';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { CartProvider } from '../(tabs)/CartContext'; 
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
   return (
-    <CartProvider>
-      <Tabs
-        initialRouteName = "index" // Establece "index" como la pantalla inicial
-        
-        screenOptions = {{
-          tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-          
-          tabBarStyle: {
-            height: 80, 
-            paddingBottom: 10,
-            paddingTop: 10,
-            backgroundColor: '#ffffff', 
-            borderTopWidth: 1, 
-            borderTopColor: '#ddd', 
-          },
+    <Tabs
+      screenOptions = {{
+        headerShown: true,
+
+        tabBarStyle: {
+          backgroundColor: '#00bfb2',
+          height: 100,
+        },
+
+        headerTitleAlign: 'center',
+
+        headerStyle: {
+          backgroundColor: '#00bfb2',
+        },
+
+        headerTitleStyle: {
+          color: 'white',
+          fontWeight: 'bold'
+        },
+
+        tabBarLabelPosition: 'below-icon'
+      }}>
+
+      <Tabs.Screen
+        name = "tienda"
+        options = {{
+          tabBarLabel: 'Tiendas',
+          headerTitle: 'Tienda',
 
           tabBarLabelStyle: {
-            fontSize: 14, 
-            fontWeight: 'bold', 
-            color: '#00C1A5'
+            color: 'white',
+            fontSize: 14,
+            fontWeight: 'bold',
+            marginBottom: 20
           },
 
+          tabBarIconStyle: {
+            marginBottom: -24
+          },
+
+          tabBarIcon: ({ color, focused, size }) => (
+            <MaterialCommunityIcons name = {focused ? 'shopping' : 'shopping-outline'} color = {'white'} size = {25} />
+          ),
         }}
-      >
-    
-        <Tabs.Screen
-          name = "home"
-          options = {{
-            title: 'Home',
-            tabBarIcon: ({ color, focused }) => (
-              <MaterialCommunityIcons name = {focused ? 'home' : 'home-outline'} size = {30} color = {'#00C1A5'}/>
-            ),
-          }}
-        />
+      />
+      
+      <Tabs.Screen
+        name = "producto"
+        options = {{
+          tabBarLabel: 'Productos',
+          headerTitle: 'Productos',
 
-        <Tabs.Screen
-          name = "Carrito"
-          options = {{
-            title: 'Carrito',
-            tabBarIcon: ({ color, focused }) => (
-              <MaterialCommunityIcons name = {focused ? 'cart' : 'cart-outline'} size = {30} color = {'#00C1A5'}/>
-            ),
-          }}
-        />
+          tabBarLabelStyle: {
+            color: 'white',
+            fontSize: 14,
+            fontWeight: 'bold',
+            marginBottom: 20
+          },
 
-        <Tabs.Screen
-          name = "HistorialPedidoScreen"
-          options = {{
-            title: 'Pedidos',
-            tabBarIcon: ({ color, focused }) => (
-              <MaterialCommunityIcons name = {focused ? 'package-variant' : 'package-variant-closed'} size = {30} color = {'#00C1A5'}/>
-            ),
-          }}
-        />
+          tabBarIconStyle: {
+            marginBottom: -24
+          },
 
-        <Tabs.Screen
-          name = "StoreDetails/[id_tienda]"
-          options  ={{
-            headerShown: false, // Oculta la barra de navegación para esta pantalla
-            tabBarStyle: { display: 'none' }, // Esconde la barra de tabs
-          }}
-        />
+          tabBarIcon: ({ color, focused, size }) => (
+            <MaterialCommunityIcons name = {focused ? 'store' : 'store-outline'} color = {'white'} size = {27} />
+          ),
+        }}
 
-      </Tabs>
-    </CartProvider>
+      />
+    </Tabs>
   );
 }
