@@ -45,18 +45,21 @@ const ConfirmacionPedidoScreen = () => {
     }
   
     try {
-      // Mantener la lógica actual de confirmar el pedido
+      // Obtener los datos personales del usuario desde el backend
+      const usuarioResponse = await axios.get(`http://localhost:5000/usuario/${userId}`);
+      const datosPersonales = usuarioResponse.data; // Asegúrate de que este endpoint retorna los datos correctamente
+  
+      // Crear el objeto del pedido
       const pedido = {
         total: totalConComision,
         idUsuario: userId, // Utiliza el ID del usuario recuperado
         tienda: items[0]?.ID_Tienda,
         direccion: direccion,
         sector: sector,
-        comentario: comentario
+        comentario: comentario,
       };
-
-
-
+  
+      // Crear el arreglo de productos
       const productos = items.map((item) => ({
         nombre: item.Nombre_Producto,
         precio: item.Precio,
@@ -64,16 +67,21 @@ const ConfirmacionPedidoScreen = () => {
         imagen: item.Imagen || 'https://via.placeholder.com/50',
       }));
   
+      // Confirmar el pedido
       await axios.post('http://localhost:5000/confirmarPedido', pedido); // Confirmar pedido
       clearCart(); // Limpiar el carrito
       setModalVisible(false); // Cerrar el modal
-      router.push('/home'); // Redirigir a la página principal
+      router.push('/PaymentScreen'); // Redirigir a la pantalla de pago
   
-      // Agregar funcionalidad para generar el PDF después de confirmar el pedido
+      // Agregar funcionalidad para generar el PDF con los datos personales
       try {
-        const response = await axios.post('http://localhost:5001/generate-pdf', { pedido, productos }, {
-          responseType: 'blob', // Recibir el PDF como archivo binario
-        });
+        const response = await axios.post(
+          'http://localhost:5001/generate-pdf',
+          { pedido, productos, datosPersonales },
+          {
+            responseType: 'blob', // Recibir el PDF como archivo binario
+          }
+        );
   
         // Convertir el archivo binario en una URL
         const fileURL = URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
@@ -81,18 +89,17 @@ const ConfirmacionPedidoScreen = () => {
         // Opcional: Mostrar una alerta para que el usuario sepa que el PDF fue generado
         console.log('PDF generado correctamente:', fileURL);
   
-        // Puedes redirigir a una vista para mostrar el PDF o descargarlo
-        // Ejemplo para redirigir:
+        // Ejemplo de redirección a una vista para mostrar el PDF
         // router.push('/pdf-view', { pdfUrl: fileURL });
       } catch (error) {
         console.error('Error al generar el PDF:', error);
-        // Puedes mostrar un mensaje opcional, pero no interrumpir el flujo principal
       }
     } catch (error) {
       console.error('Error al confirmar el pedido:', error);
       setError('Hubo un problema al confirmar el pedido. Intenta de nuevo.');
     }
   };
+  
   
 
   const renderItem = ({ item }) => (

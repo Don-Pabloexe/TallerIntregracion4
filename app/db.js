@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt'); // Para encriptar contraseñas
 const cors = require('cors');
 const nodemailer = require('nodemailer');
 const { Client } = require('pg');
+const bodyParser = require('body-parser');
 
 const app = express();
 const port = 5000;
@@ -11,6 +12,7 @@ const port = 5000;
 // Configura CORS para permitir peticiones desde tu aplicación React Native
 app.use(cors());
 app.use(express.json());
+app.use(bodyParser.json());
 
 // Configura el pool de conexiones a PostgreSQL
 const pool = new Pool({
@@ -30,32 +32,53 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+// Endpoint para enviar el correo con el PDF adjunto
 app.post('/enviar-correo', async (req, res) => {
   console.log('Recibiendo solicitud de correo...');
+
+  const { emailReceptor, nombreArchivo } = req.body; // Datos enviados desde el frontend
+  const pdfPath = `./${nombreArchivo}`; // Ruta del archivo PDF generado
+
   try {
+    // Verificar si el archivo PDF existe
+    if (!fs.existsSync(pdfPath)) {
+      return res.status(404).json({ error: 'El archivo PDF no existe' });
+    }
+
+    // Opciones del correo
     const mailOptions = {
-      from: 'horacioquiroga752@gmail.com', // Email del emisor
-      to: 'pgomez2021@alu.uct.cl', // Email del receptor
-      subject: 'Taller Integracion', // Titular del correo
-      text: 'Avanza con lo de taller watona qla', // Contenido del correo
+      from: 'horacioquiroga752@gmail.com', // Correo del emisor
+      to: emailReceptor, // Correo del receptor enviado desde el frontend
+      subject: 'Boleta Electrónica - Taller Integración',
+      text: 'Adjuntamos la boleta generada para su pedido. ¡Gracias por tu compra!',
+      attachments: [
+        {
+          filename: nombreArchivo, // Nombre del archivo adjunto
+          path: pdfPath, // Ruta completa del archivo
+        },
+      ],
     };
 
+    // Enviar el correo
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         console.error('Error al enviar el correo:', error);
-        // Responde con JSON en caso de error
         return res.status(500).json({ error: 'Error al enviar el correo' });
       }
-      console.log('Correo enviado correctamente', info);
-      // Responde con JSON en caso de éxito
+      console.log('Correo enviado correctamente:', info.response);
       return res.status(200).json({ message: 'Correo enviado correctamente' });
     });
   } catch (error) {
     console.error('Error en el servidor:', error);
-    // Responde con JSON en caso de error
     return res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
+
+
+
+
+
+
 
 // Ruta para registrar un nuevo usuario
 app.post('/register', async (req, res) => {
@@ -83,6 +106,37 @@ app.post('/register', async (req, res) => {
     res.status(500).send('Error al registrar el usuario');
   }
 });
+
+app.get('/usuario/:id_usuario', async (req, res) => {
+  const { id_usuario } = req.params;
+
+  try {
+    // Consulta SQL para obtener los datos del usuario por ID
+    const query = `
+      SELECT Nombre, Apellido, Correo_Email, Telefono, Rut
+      FROM Usuario
+      WHERE id_usuario = $1
+    `;
+    const values = [id_usuario];
+
+    const result = await pool.query(query, values);
+
+    if (result.rows.length === 0) {
+      return res.status(404).send('Usuario no encontrado');
+    }
+
+    // Enviar los datos del usuario como respuesta
+    res.status(200).json(result.rows[0]);
+  } catch (err) {
+    console.error('Error al obtener los datos del usuario:', err);
+    res.status(500).send('Error al obtener los datos del usuario');
+  }
+});
+
+
+
+
+
 
 // Ruta para iniciar sesión
 app.post('/login', async (req, res) => {
@@ -145,7 +199,7 @@ app.post('/reset-password', async (req, res) => {
 // Obtener todos los productos
 app.get('/products', async (req, res) => {
   try {
-    const result = await pool.query('SELECT id_producto AS id, nombre_producto AS nombre, precio, id_tienda FROM producto');
+    const result = await pool.query('SELECT id_producto AS id, nombre_producto AS nombre, precio, id_tienda, imagen FROM producto');
     res.json(result.rows);
   } catch (error) {
     console.error('Error fetching products:', error);
@@ -191,7 +245,7 @@ app.get('/historialPedido', async (req, res) => {
 
   try {
     const result = await pool.query(
-      'SELECT id_pedido, fecha_pedido, hora_pedido, precio_total, direccion, sector, comentarios, estado FROM pedido WHERE id_usuario = $1',
+      'SELECT id_pedido, fecha_pedido, hora_pedido, precio_total, direccion, sector, comentarios, estado FROM pedido WHERE id_usuario = $1 ORDER BY fecha_pedido DESC, hora_pedido DESC',
       [id_usuario]
     );
     res.json(result.rows);
@@ -201,6 +255,7 @@ app.get('/historialPedido', async (req, res) => {
     res.status(500).json({ error: 'Error al obtener pedidos' });
   }
 });
+
 
 app.get('/DatosEntregaPedido', async (req, res) => {
   const { id_pedido } = req.query; // Asegúrate de que este parámetro sea correcto
@@ -365,6 +420,70 @@ app.get('/productosBusqueda', async (req, res) => {
   }
 });
 
+
+app.get('/pedido/monto_reciente/:id_usuario', async (req, res) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+  res.set('Surrogate-Control', 'no-store');
+
+  const { id_usuario } = req.params;
+
+  try {
+    const result = await pool.query(
+      `SELECT monto 
+       FROM monto_reciente 
+       WHERE id_usuario = $1`,
+      [id_usuario]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).send('No se encontró información para este usuario.');
+    }
+
+    res.json({ monto: result.rows[0].monto });
+  } catch (error) {
+    console.error('Error al obtener el monto reciente:', error);
+    res.status(500).send('Error al obtener el monto reciente.');
+  }
+});
+
+
+
+app.post('/pagar', (req, res) => {
+  const { monto, tarjeta } = req.body;
+
+  // Validar que los datos de la tarjeta y el monto estén completos
+  if (!monto || !tarjeta || !tarjeta.numero || !tarjeta.nombre || !tarjeta.fecha_expiracion || !tarjeta.cvv) {
+    return res.status(400).json({ error: 'Datos de pago incompletos.' });
+  }
+
+  console.log('Datos del pago recibidos:', {
+    monto,
+    tarjeta,
+  });
+
+  // Simular el procesamiento del pago
+  setTimeout(() => {
+    // Generar una respuesta simulada exitosa
+    return res.status(200).json({ mensaje: 'Pago procesado con éxito.', estado: 'aprobado' });
+  }, 2000); // Simula un tiempo de procesamiento de 2 segundos
+});
+
+
+
+
+
+
+
+
+
+
 app.listen(port, () => {
   console.log(`Servidor corriendo en http://localhost:${port}`);
 });
+
+
+
+
+

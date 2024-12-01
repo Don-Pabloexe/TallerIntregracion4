@@ -1,7 +1,8 @@
-
 import React, { useEffect, useState } from 'react';
-import { View, Text, ActivityIndicator, StyleSheet, FlatList, TextInput, Animated } from 'react-native';
+import { View, Text, Image, StyleSheet, FlatList, TextInput, Animated } from 'react-native';
 import axios from 'axios';
+
+import { TouchableOpacity } from 'react-native';
 
 function SkeletonPlaceholder() {
   return (
@@ -91,14 +92,25 @@ export default function ProductoList() {
         <FlatList
           data = {productos}
           keyExtractor = {(item) => item.id_producto.toString()}
+          numColumns = {2} // Divide los elementos en 2 columnas
+
+          columnWrapperStyle = {{
+            justifyContent: 'center', // Centra las tarjetas horizontalmente en la fila
+          }}
+
           renderItem = {({ item }) => (
 
-            <View style = {styles.productos}>
-                <View style = {styles.productoContainer}>               
-                  <Text style = {styles.nombre}>{item.nombre_producto}</Text>
-                  <Text style = {styles.precio}>Precio: {item.precio}</Text>               
-                </View>
-            </View>
+            <TouchableOpacity style = {styles.productos}>
+              <Image
+                 source = {{ uri: item.imagen }} // URL de la imagen del producto
+                  style = {styles.imagen} // Estilo de la imagen
+                  resizeMode = "cover" // Ajusta cómo la imagen se escala
+                />
+              <View style = {styles.productoContainer}>               
+                <Text style = {styles.nombre}>{item.nombre_producto}</Text>
+                <Text style = {styles.precio}>${item.precio}</Text>               
+              </View>
+            </TouchableOpacity >
           )}
         />
       )}
@@ -109,10 +121,13 @@ export default function ProductoList() {
 const styles = StyleSheet.create({
   
   body: {
+    flex: 1,
     padding: 20,
+    backgroundColor: 'white'
   },
 
   searchInput: {
+    width: '100%',
     height: 40,
     borderColor: '#ccc',
     borderWidth: 1,
@@ -130,32 +145,47 @@ const styles = StyleSheet.create({
   },
 
   productos: {
-    flexDirection: 'row'
+    alignContent: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+    textAlign: 'center',
+
+    width: '45%',
+
+    marginBottom: 30,
+    marginHorizontal: 5,
   },
 
   productoContainer: {
-    backgroundColor: '#00C1A5',
-    width: '40%',
-    marginBottom: 10,
+    marginBottom: 20,
     padding: 15,
-    borderRadius: 10,
   },
 
   nombre: {
+    textAlign: 'center',
     fontSize: 18,
     fontWeight: 'bold',
   },
 
   descripcion: {
-    fontSize: 14,
+    textAlign: 'center',
     color: 'black',
+    fontSize: 14,
   },
 
   precio: {
-    fontSize: 16,
+    textAlign: 'center',
     fontWeight: 'bold',
-    color: 'white',
-    marginTop: 15
+    fontVariant: 'italic',
+    color: 'black',
+
+    marginTop: 15,
+    fontSize: 22,
+  },
+
+  imagen: {
+    width: '100%', 
+    height: 150,
   },
 
   skeletonContainer: {
