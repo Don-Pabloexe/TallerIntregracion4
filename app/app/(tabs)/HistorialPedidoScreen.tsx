@@ -10,12 +10,14 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { useRouter } from 'expo-router';
 
 const HistorialPedidoScreen = () => {
   const [pedidos, setPedidos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [pedidoSeleccionado, setPedidoSeleccionado] = useState(null);
+  const router = useRouter();
   const [ws, setWs] = useState(null);
 
   useEffect(() => {
@@ -27,7 +29,7 @@ const HistorialPedidoScreen = () => {
           return;
         }
 
-        const response = await axios.get('http://localhost:5000/historialPedido', {
+        const response = await axios.get('http://192.168.101.6:5000/historialPedido', {
           params: { id_usuario },
         });
 
@@ -68,7 +70,7 @@ const HistorialPedidoScreen = () => {
     }
   
     // Crear una nueva conexión WebSocket solo si no existe
-    const newWs = new WebSocket('ws://127.0.0.1:5002');
+    const newWs = new WebSocket('ws://192.168.101.6:5002');
     setWs(newWs);
   
     newWs.onopen = () => {
@@ -114,8 +116,7 @@ const HistorialPedidoScreen = () => {
     // Configurar el modal con el pedido seleccionado
     setPedidoSeleccionado(pedido);
     setModalVisible(true);
-  };
-  
+  }; 
 
   if (loading) {
     return (
@@ -125,11 +126,24 @@ const HistorialPedidoScreen = () => {
     );
   }
 
+  const handleEntregaDetails = (id_pedido) => {
+    if (!id_pedido) {
+      console.error('id_pedido es undefined o null');
+      return;
+    }
+    console.log('Navegando a /StoreDetails/entrega/' + id_pedido);
+    router.push(`/StoreDetails/entrega/${id_pedido}`);
+  };
+
   const ProgressBar = ({ progress }) => (
     <View style={styles.progressBarContainer}>
       <View style={[styles.progressBarFill, { width: `${progress}%` }]} />
     </View>
   );
+
+  const getCircleColor = (estado, circuloNumero) => {
+    return estado >= circuloNumero ? '#00C1A5' : '#CCCCCC';
+  };
 
   return (
     <View style={styles.container}>
@@ -168,11 +182,28 @@ const HistorialPedidoScreen = () => {
                 <ProgressBar progress={pedidoSeleccionado.progress} />
                 <Text style={styles.progressText}>{pedidoSeleccionado.progress.toFixed(2)}%</Text>
                 <Text style={styles.progressText}>Estado: {pedidoSeleccionado.estado}</Text>
+                
                 <TouchableOpacity
-                  style={styles.closeButton}
-                  onPress={() => setModalVisible(false)}
+                  style = {[
+                    styles.EstadoEntregaButton,
+                    {
+                      backgroundColor: pedidoSeleccionado.estado === 100 ? '#00C1A5' : 'gray', // Verde si estado es 2, gris en otro caso
+                    },
+                  ]}
+                  onPress = {() => {
+                    setModalVisible(false);
+                    handleEntregaDetails(pedidoSeleccionado.id_pedido);
+                  }}
+                  disabled = {pedidoSeleccionado.estado < 50} // Deshabilitar si estado es menor a 2
                 >
-                  <Text style={styles.closeButtonText}>Cerrar</Text>
+                  <Text style={styles.closeButtonText}>Revisa aquí los datos de entrega</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity
+                  style = {styles.closeButton}
+                  onPress = {() => setModalVisible(false)}
+                >
+                  <Text style = {styles.closeButtonText}>Cerrar</Text>
                 </TouchableOpacity>
               </>
             )}
@@ -184,45 +215,120 @@ const HistorialPedidoScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, backgroundColor: '#F2F2F2' },
-  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 16, textAlign: 'center' },
-  noPedidosText: { fontSize: 18, color: '#A6A6A6', textAlign: 'center', marginTop: 20 },
-  pedidoItem: { padding: 16, backgroundColor: '#FFFFFF', marginBottom: 10, borderRadius: 8 },
-  pedidoText: { fontSize: 16, marginBottom: 8 },
+  container: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: '#F3F4F6', // Fondo general más limpio
+  },
+  title: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+    color: '#1F2937', // Texto más oscuro
+  },
+  noPedidosText: {
+    fontSize: 18,
+    color: '#9CA3AF',
+    textAlign: 'center',
+    marginTop: 20,
+  },
+  pedidoItem: {
+    padding: 20,
+    backgroundColor: '#34D399', // Fondo verde claro agua
+    marginBottom: 15,
+    borderRadius: 15, // Bordes redondeados
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+    flexDirection: 'column',
+  },
+  pedidoText: {
+    fontSize: 16,
+    marginBottom: 5,
+    color: '#FFFFFF', // Texto blanco para contrastar con el verde
+    fontWeight: '600', // Letras más gruesas
+  },
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)', // Fondo más oscuro para resaltar el modal
   },
   modalContent: {
     backgroundColor: '#FFFFFF',
-    padding: 20,
-    borderRadius: 10,
-    width: '80%',
+    padding: 25,
+    borderRadius: 15,
+    width: '85%',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 5,
   },
-  modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 20 },
-  progressText: { fontSize: 16, marginTop: 10 },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 15,
+    color: '#111827',
+    textAlign: 'center',
+  },
+  progressText: {
+    fontSize: 16,
+    marginVertical: 10,
+    color: '#6B7280',
+  },
   progressBarContainer: {
     width: '100%',
     height: 20,
-    backgroundColor: '#E0E0E0',
-    borderRadius: 10,
+    backgroundColor: '#E5E7EB',
+    borderRadius: 12,
     overflow: 'hidden',
+    marginTop: 10,
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: '#00C1A5',
+    backgroundColor: '#10B981', // Verde más vibrante
   },
   closeButton: {
     marginTop: 20,
-    backgroundColor: '#00C1A5',
+    backgroundColor: '#10B981', // Verde vibrante
     paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 5,
+    paddingHorizontal: 25,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 3,
   },
-  closeButtonText: { fontSize: 16, color: '#FFFFFF' },
+  closeButtonText: {
+    fontSize: 16,
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  EstadoEntregaButton: {
+    alignSelf: 'center',
+    backgroundColor: '#2563EB', // Azul vibrante
+    alignItems: 'center',
+    borderRadius: 15,
+    width: '80%',
+    height: 50,
+    justifyContent: 'center',
+    marginVertical: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.15,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  EstadoEntregaButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
 });
+
+
 
 export default HistorialPedidoScreen;

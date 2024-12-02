@@ -64,7 +64,7 @@ const HorizontalBrandCarousel: React.FC<{ marcas: Marca[] }> = ({ marcas }) => {
             }}
           >
             {item.imagen && (
-              <Image source = {{ uri: item.imagen1 }} style = {styles.image} />
+              <Image source = {{ uri: item.imagen }} style = {styles.image} />
             )}
             <Text style = {styles.title}>{item.nombre}</Text>
           </TouchableOpacity>
@@ -145,11 +145,11 @@ export default function HomeScreen() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const marcasResponse = await axios.get('http://localhost:5000/marcas');
+        const marcasResponse = await axios.get('http://192.168.101.6:5000/marcas');
         const marcasData: Marca[] = marcasResponse.data;
         setMarcas(marcasData);
 
-        const productsResponse = await axios.get('http://localhost:5000/products');
+        const productsResponse = await axios.get('http://192.168.101.6:5000/products');
         const productsData = productsResponse.data;
         console.log("Datos de productos:", productsData);  // Verifica qué datos están llegando
         setProducts(productsData);

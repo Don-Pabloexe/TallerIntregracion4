@@ -5,74 +5,90 @@ const cors = require('cors');
 const nodemailer = require('nodemailer');
 const { Client } = require('pg');
 const bodyParser = require('body-parser');
+const fs = require('fs');
+const path = require('path');
+
 
 const app = express();
 const port = 5000;
 
 // Configura CORS para permitir peticiones desde tu aplicación React Native
-app.use(cors());
+const cors = require('cors');
+app.use(cors({ origin: '*' }));
+
 app.use(express.json());
 app.use(bodyParser.json());
 
 // Configura el pool de conexiones a PostgreSQL
 const pool = new Pool({
   user: 'postgres',     // Usuario de PostgreSQL
-  host: 'localhost',    // Servidor de PostgreSQL
+  host: '192.168.101.6',    // Servidor de PostgreSQL
   database: 'postgres', // Nombre de la base de datos
   password: 'seba1234', // Contraseña de PostgreSQL
   port: 5432,           // Puerto de PostgreSQL
 });
 
 // Configuración de Nodemailer
+app.use(express.json()); // Middleware para analizar JSON
+
+// Configuración de Nodemailer
 const transporter = nodemailer.createTransport({
-  service: 'gmail', // o el servicio que desees
+  service: 'gmail', // Cambia según el servicio que uses
   auth: {
-    user: 'horacioquiroga752@gmail.com', // Correo del usuario que va a enviar los correos
-    pass: 'hphn zbrw kacl lume', // Contraseña
+    user: 'mondongoempresasa@gmail.com', // Correo del emisor
+    pass: 'xewd ckte ttlc jrqo', // Contraseña o app password de Gmail
   },
 });
 
 // Endpoint para enviar el correo con el PDF adjunto
 app.post('/enviar-correo', async (req, res) => {
   console.log('Recibiendo solicitud de correo...');
+  const { emailReceptor, nombreArchivo } = req.body;
 
-  const { emailReceptor, nombreArchivo } = req.body; // Datos enviados desde el frontend
-  const pdfPath = `./${nombreArchivo}`; // Ruta del archivo PDF generado
+  console.log('Datos recibidos:', { emailReceptor, nombreArchivo });
 
-  try {
-    // Verificar si el archivo PDF existe
-    if (!fs.existsSync(pdfPath)) {
-      return res.status(404).json({ error: 'El archivo PDF no existe' });
-    }
-
-    // Opciones del correo
-    const mailOptions = {
-      from: 'horacioquiroga752@gmail.com', // Correo del emisor
-      to: emailReceptor, // Correo del receptor enviado desde el frontend
-      subject: 'Boleta Electrónica - Taller Integración',
-      text: 'Adjuntamos la boleta generada para su pedido. ¡Gracias por tu compra!',
-      attachments: [
-        {
-          filename: nombreArchivo, // Nombre del archivo adjunto
-          path: pdfPath, // Ruta completa del archivo
-        },
-      ],
-    };
-
-    // Enviar el correo
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error('Error al enviar el correo:', error);
-        return res.status(500).json({ error: 'Error al enviar el correo' });
-      }
-      console.log('Correo enviado correctamente:', info.response);
-      return res.status(200).json({ message: 'Correo enviado correctamente' });
-    });
-  } catch (error) {
-    console.error('Error en el servidor:', error);
-    return res.status(500).json({ error: 'Error interno del servidor' });
+  // Validar que los datos sean correctos
+  if (!emailReceptor || !nombreArchivo) {
+    console.error('Datos faltantes:', { emailReceptor, nombreArchivo });
+    return res.status(400).json({ error: 'Faltan datos para enviar el correo' });
   }
+
+  // Ruta absoluta al archivo PDF
+  const pdfPath = path.join(__dirname, 'boletas', nombreArchivo);
+
+  // Verificar si el archivo existe
+  if (!fs.existsSync(pdfPath)) {
+    console.error('Archivo PDF no encontrado:', pdfPath);
+    return res.status(404).json({ error: 'El archivo PDF no existe' });
+  }
+
+  // Opciones del correo
+  const mailOptions = {
+    from: 'mondongoempresasa@gmail.com',
+    to: emailReceptor,
+    subject: 'Boleta Electrónica - Taller Integración',
+    text: 'Adjuntamos la boleta generada para su pedido. ¡Gracias por tu compra!',
+    attachments: [
+      {
+        filename: nombreArchivo,
+        path: pdfPath,
+      },
+    ],
+  };
+
+  // Enviar el correo
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error('Error al enviar el correo:', error);
+      return res.status(500).json({ error: 'Error al enviar el correo' });
+    }
+    console.log('Correo enviado correctamente:', info.response);
+    return res.status(200).json({ message: 'Correo enviado correctamente' });
+  });
 });
+
+
+
 
 
 

@@ -16,7 +16,7 @@ export default function pedidoDetails() {
   useEffect(() => {
     const fetchpedidoDetails = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/DatosEntregaPedido`, {
+        const response = await axios.get(`http://192.168.101.6:5000/DatosEntregaPedido`, {
           params: { id_pedido },
         });
         setpedidoDetails(response.data);

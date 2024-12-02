@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, Picker } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, Modal, FlatList, Image } from 'react-native';
 import { useRouter, useNavigation } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from './axiosConfig';
@@ -14,6 +14,8 @@ const PaymentScreen = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [isMonthModalVisible, setIsMonthModalVisible] = useState(false);
+  const [isYearModalVisible, setIsYearModalVisible] = useState(false);
 
   const router = useRouter();
   const navigation = useNavigation();
@@ -32,7 +34,7 @@ const PaymentScreen = () => {
         }
 
         // Realiza la consulta al backend para obtener el monto más reciente
-        const response = await axios.get(`http://localhost:5000/pedido/monto_reciente/${userId}`);
+        const response = await axios.get(`http://192.168.101.6:5000/pedido/monto_reciente/${userId}`);
         if (!response.data || response.data.monto === undefined) {
           setError('No se pudo cargar el monto.');
           setMonto(null);
@@ -56,12 +58,19 @@ const PaymentScreen = () => {
       Alert.alert('Error', 'Por favor completa todos los campos del formulario.');
       return;
     }
-  
+
     setIsProcessing(true); // Muestra un indicador de procesamiento
-  
+
     try {
+      const userId = await AsyncStorage.getItem('userId');
+      if (!userId) {
+        Alert.alert('Error', 'No se pudo identificar al usuario.');
+        return;
+      }
+
       // Enviar los datos al backend para procesar el pago
-      const response = await axios.post('http://localhost:5000/pagar', {
+      const response = await axios.post('http://192.168.101.6:5000/pagar', {
+        userId,
         monto,
         tarjeta: {
           numero: cardNumber,
@@ -70,11 +79,11 @@ const PaymentScreen = () => {
           cvv,
         },
       });
-  
+
       // Verifica la respuesta del backend
       if (response.status === 200 && response.data.estado === 'aprobado') {
-        Alert.alert('Éxito', response.data.mensaje); // Muestra el mensaje del backend
-        router.push('/SuccessScreen'); // Redirige a una pantalla de éxito si es necesario
+        Alert.alert('Éxito', response.data.mensaje);
+        router.push('/SuccessScreen');
       } else {
         Alert.alert('Error', 'Hubo un problema al procesar el pago. Intenta de nuevo.');
       }
@@ -85,21 +94,39 @@ const PaymentScreen = () => {
       setIsProcessing(false); // Oculta el indicador de procesamiento
     }
   };
-  
 
-  if (error) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.errorText}>{error}</Text>
+  const renderModal = (data, onSelect, closeModal) => (
+    <Modal transparent visible>
+      <View style={styles.modalContainer}>
+        <FlatList
+          data={data}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={styles.modalItem}
+              onPress={() => {
+                onSelect(item);
+                closeModal();
+              }}
+            >
+              <Text>{item}</Text>
+            </TouchableOpacity>
+          )}
+        />
+        <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
+          <Text style={styles.closeButtonText}>Cerrar</Text>
+        </TouchableOpacity>
       </View>
-    );
-  }
+    </Modal>
+  );
+
+  const months = Array.from({ length: 12 }, (_, i) => `${i + 1 < 10 ? '0' : ''}${i + 1}`);
+  const years = Array.from({ length: 10 }, (_, i) => `${2024 + i}`);
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Monto a pagar: ${monto}</Text>
 
-      {/* Formulario de datos de la tarjeta */}
       <TextInput
         style={styles.input}
         placeholder="Nombre del Titular"
@@ -127,29 +154,41 @@ const PaymentScreen = () => {
         />
       </View>
 
-      <View style={styles.row}>
-        <View style={[styles.pickerContainer, styles.rowItem]}>
-          <Picker
-            selectedValue={expiryMonth}
-            onValueChange={(itemValue) => setExpiryMonth(itemValue)}
-          >
-            {Array.from({ length: 12 }, (_, i) => (
-              <Picker.Item key={i} label={`${i + 1 < 10 ? '0' : ''}${i + 1}`} value={`${i + 1 < 10 ? '0' : ''}${i + 1}`} />
-            ))}
-          </Picker>
-        </View>
-
-        <View style={[styles.pickerContainer, styles.rowItem]}>
-          <Picker
-            selectedValue={expiryYear}
-            onValueChange={(itemValue) => setExpiryYear(itemValue)}
-          >
-            {Array.from({ length: 10 }, (_, i) => (
-              <Picker.Item key={i} label={`${2024 + i}`} value={`${2024 + i}`} />
-            ))}
-          </Picker>
-        </View>
+      <View style={styles.iconsRow}>
+        <Image
+          source={{ uri: 'https://handsonbanking.org/wp-content/uploads/2021/02/debitcard_front_blue.png' }}
+          style={styles.cardIcon}
+        />
+        <Image
+          source={{ uri: 'https://w7.pngwing.com/pngs/49/82/png-transparent-credit-card-visa-logo-mastercard-bank-mastercard-blue-text-rectangle.png' }}
+          style={styles.cardIcon}
+        />
+        <Image
+          source={{ uri: 'https://w1.pngwing.com/pngs/191/339/png-transparent-visa-mastercard-logo-credit-card-yellow-text-line-area-circle.png' }}
+          style={styles.cardIcon}
+        />
       </View>
+
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={[styles.pickerContainer, styles.rowItem]}
+          onPress={() => setIsMonthModalVisible(true)}
+        >
+          <Text>{expiryMonth}</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.pickerContainer, styles.rowItem]}
+          onPress={() => setIsYearModalVisible(true)}
+        >
+          <Text>{expiryYear}</Text>
+        </TouchableOpacity>
+      </View>
+
+      {isMonthModalVisible &&
+        renderModal(months, setExpiryMonth, () => setIsMonthModalVisible(false))}
+      {isYearModalVisible &&
+        renderModal(years, setExpiryYear, () => setIsYearModalVisible(false))}
 
       <TouchableOpacity
         style={[styles.payButton, isProcessing && styles.payButtonDisabled]}
@@ -164,28 +203,35 @@ const PaymentScreen = () => {
   );
 };
 
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#f2f2f2',
+    backgroundColor: '#f9f9f9',
   },
   title: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: 'bold',
     marginBottom: 20,
+    color: '#333',
   },
   input: {
     backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    padding: 10,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 15,
     fontSize: 16,
     marginBottom: 15,
     width: '100%',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 5,
+    elevation: 2,
   },
   row: {
     flexDirection: 'row',
@@ -199,17 +245,28 @@ const styles = StyleSheet.create({
   pickerContainer: {
     backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
+    borderColor: '#ddd',
+    borderRadius: 8,
     height: 50,
     justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 5,
+    elevation: 2,
   },
   payButton: {
-    backgroundColor: '#ff0000',
+    backgroundColor: '#4CAF50',
     paddingVertical: 15,
-    borderRadius: 10,
+    borderRadius: 8,
     width: '100%',
     alignItems: 'center',
+    marginTop: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 3 },
+    shadowRadius: 6,
+    elevation: 3,
   },
   payButtonDisabled: {
     backgroundColor: '#ccc',
@@ -221,11 +278,24 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 18,
-    color: '#333',
+    color: '#666',
   },
   errorText: {
     fontSize: 18,
     color: 'red',
+    textAlign: 'center',
+  },
+  iconsRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  cardIcon: {
+    width: 50,
+    height: 30,
+    resizeMode: 'contain',
+    marginHorizontal: 5,
   },
 });
 

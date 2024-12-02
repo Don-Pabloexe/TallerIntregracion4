@@ -8,7 +8,7 @@ const EnviarCorreo = () => {
   const enviarCorreo = async () => {
     console.log('Enviando correo...'); // Agrega este log para verificar si se está llamando a la función
     try {
-      const response = await fetch('http://localhost:5000/enviar-correo', {
+      const response = await fetch('http://192.168.101.6:5000/enviar-correo', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

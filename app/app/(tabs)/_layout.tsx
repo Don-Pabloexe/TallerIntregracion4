@@ -7,6 +7,7 @@ import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { CartProvider } from '../(tabs)/CartContext'; 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import StoreDetails from '../StoreDetails/tienda/[id_tienda]';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -81,6 +82,9 @@ export default function TabLayout() {
         
 
       </Tabs>
+
+
+      
     </CartProvider>
   );
 }

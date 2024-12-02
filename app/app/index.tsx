@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { View, TextInput, StyleSheet, Image, TouchableOpacity, Alert, Modal, ActivityIndicator } from 'react-native';
+import { View, TextInput, StyleSheet, Image, TouchableOpacity, Alert, Modal, ActivityIndicator, Dimensions } from 'react-native';
 import { CheckBox } from 'react-native-elements';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -11,6 +11,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage'; // Importa
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
+const { width, height } = Dimensions.get('window'); // Obtiene las dimensiones de la pantalla
+
 
 export default function IndexScreen() {
   const router = useRouter();
@@ -18,12 +20,14 @@ export default function IndexScreen() {
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  
+
 
   const handleLogin = async () => {
     setIsLoggingIn(true);
 
     try {
-      const response = await axios.post('http://localhost:5000/login', {
+      const response = await axios.post('http://192.168.101.6:5000/login', {
         email,
         password
       });
@@ -56,10 +60,10 @@ export default function IndexScreen() {
 
   return (
     <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
+      headerBackgroundColor={{ light: '#b1babd', dark: '#1D3D47' }}
       headerImage={
         <Image
-          source={require('@/assets/images/partial-react-logo.png')}
+          source={require('@/assets/images/mondongo.png')}
           style={styles.logo}
         />
       }
@@ -140,10 +144,11 @@ export default function IndexScreen() {
 
 const styles = StyleSheet.create({
   logo: {
-    height: 100,
-    width: 100,
-    marginBottom: 20,
-    alignSelf: 'center',
+    height: height * 0.3, // El logo ocupa el 30% de la altura de la pantalla
+    width: width * 1, // El logo ocupa el 80% del ancho de la pantalla
+    alignSelf: 'center', // Centra el logo horizontalmente
+    borderRadius: 10, // Opcional: Bordes redondeados
+    backgroundColor: '#add8e6', // Color de fondo
   },
   centeredContainer: {
     flex: 1,

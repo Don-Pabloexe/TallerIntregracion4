@@ -49,7 +49,7 @@ export default function ProductoList() {
     const fetchProductos = async () => {
       setLoading(true);
       try {
-        const response = await axios.get('http://localhost:5000/productosBusqueda', {
+        const response = await axios.get('http://192.168.101.6:5000/productosBusqueda', {
           params: { search: debouncedSearch }
         });
 
